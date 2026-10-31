@@ -10,9 +10,9 @@ export const HomeSkeleton: React.FC = () => {
   return (
     <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none animate-in fade-in duration-150">
       {/* Top Blue Header */}
-      <div className="bg-[#1078CA] px-4 pt-3 pb-24 relative overflow-hidden">
+      <div className="bg-[#1078CA] px-4 pt-2 pb-5 rounded-b-[2rem] relative overflow-hidden">
         <StatusBar darkTheme={true} />
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center justify-between mt-2 mb-3">
           <div className="flex items-center space-x-3">
             {/* Avatar Circle */}
             <div className="w-10 h-10 rounded-full skeleton-shimmer bg-white/20" />
@@ -26,25 +26,23 @@ export const HomeSkeleton: React.FC = () => {
             <div className="w-8 h-8 rounded-full skeleton-shimmer bg-white/20" />
           </div>
         </div>
-      </div>
 
-      {/* Saldo Floating Card */}
-      <div className="px-4 -mt-16 relative z-10">
-        <div className="bg-white rounded-2xl p-4 shadow-md border border-slate-100 space-y-4">
+        {/* Saldo Card Skeleton (inside header) */}
+        <div className="mt-3 bg-white/10 rounded-2xl p-4 border border-white/20 space-y-4">
           <div className="flex items-center justify-between">
-            <div className="w-28 h-3.5 rounded-full skeleton-shimmer" />
-            <div className="w-5 h-5 rounded-full skeleton-shimmer" />
+            <div className="w-28 h-3.5 rounded-full skeleton-shimmer bg-white/20" />
+            <div className="w-5 h-5 rounded-full skeleton-shimmer bg-white/20" />
           </div>
-          <div className="w-44 h-7 rounded-lg skeleton-shimmer" />
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-            <div className="w-32 h-3 rounded-full skeleton-shimmer" />
-            <div className="w-16 h-3 rounded-full skeleton-shimmer" />
+          <div className="w-44 h-7 rounded-lg skeleton-shimmer bg-white/30" />
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between">
+            <div className="w-32 h-3 rounded-full skeleton-shimmer bg-white/20" />
+            <div className="w-16 h-3 rounded-full skeleton-shimmer bg-white/20" />
           </div>
         </div>
       </div>
 
-      {/* 4 Action Pills Card */}
-      <div className="px-4 mt-3">
+      {/* 4 Action Pills Card (starts below header) */}
+      <div className="px-4 mt-3.5">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 grid grid-cols-4 gap-2">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex flex-col items-center space-y-2">

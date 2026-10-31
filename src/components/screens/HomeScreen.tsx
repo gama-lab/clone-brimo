@@ -80,7 +80,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="min-h-full pb-20 bg-slate-50 flex flex-col select-none">
       {/* Top Blue Canvas Header */}
-      <div className="bg-[#1078CA] text-white pt-1 pb-16 px-4 rounded-b-[2rem] shadow-sm relative overflow-hidden">
+      <div className="bg-[#1078CA] text-white pt-2 pb-5 px-4 rounded-b-[2rem] shadow-sm relative overflow-hidden">
         <StatusBar darkTheme={true} />
 
         {/* Decorative subtle wave */}
@@ -121,7 +121,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         </div>
 
-        {/* Saldo Rekening Utama Card (from Photo on 31-10-26 at 15.09 #2.jpg) */}
+        {/* Card Keterangan: Saldo Rekening Utama (Harus tampil penuh & tidak tertutupi) */}
         <div className="mt-3 bg-gradient-to-r from-[#0c5999] via-[#0b63ac] to-[#1078CA] rounded-2xl p-4 border border-white/20 shadow-lg relative overflow-hidden">
           {/* Wavy background accent */}
           <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none" />
@@ -158,9 +158,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Main Body */}
-      <div className="px-4 -mt-10 z-10 space-y-3.5">
-        {/* Top 4 Floating Action Bar (White Card) */}
+      {/* Main Body (Tampil di bawah Card Keterangan tanpa menutupi) */}
+      <div className="px-4 mt-3.5 space-y-3.5">
+        {/* Main Action Buttons (Transfer, BRIVA, Cicil Emas, Pulsa/Data) */}
         <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 flex items-center justify-around">
           <button onClick={onOpenTransfer} className="flex flex-col items-center active:scale-95 transition-transform">
             <IconBrimoTransfer size={24} />
