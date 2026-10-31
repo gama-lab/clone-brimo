@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Share2, ChevronDown, ChevronUp, CheckCircle2, CreditCard } from 'lucide-react';
 import { Transaction, UserProfile } from '../../types';
 import { formatRupiah, formatDateIndo } from '../../utils/format';
 import { classifyTransaction } from '../../utils/transactionHelper';
@@ -23,27 +23,39 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
   const displayDateStr = `${formatDateIndo(transaction.date)}, ${displayTime.includes('WIB') ? displayTime : `${displayTime} WIB`}`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1078CA] flex flex-col justify-between overflow-y-auto no-scrollbar select-none animate-in fade-in duration-200">
-      <div className="pb-6">
-        {/* Safe area top */}
-        <div className="h-[max(1rem,env(safe-area-inset-top,1rem))]" />
+    <div className="fixed inset-0 z-50 bg-[#F4F7FB] flex flex-col justify-between overflow-y-auto no-scrollbar select-none animate-in fade-in duration-200">
+      <div>
+        {/* Top Vibrant Blue Curved Banner (matches media_1793438854718_f7e3288c.jpg) */}
+        <div className="relative bg-[#0B7DE6] text-white pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-14 px-4 overflow-hidden flex-shrink-0">
+          {/* Organic flowing curved waves */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
+            preserveAspectRatio="none"
+            viewBox="0 0 400 240"
+            fill="none"
+          >
+            <path
+              d="M-40 150 C 70 80, 190 200, 440 100"
+              stroke="white"
+              strokeWidth="50"
+              strokeLinecap="round"
+            />
+            <path
+              d="M-20 60 C 130 170, 270 40, 440 130"
+              stroke="white"
+              strokeWidth="35"
+              strokeLinecap="round"
+            />
+          </svg>
 
-        {/* Top Header & Animated Checkmark Badge (Exact match to Reference WhatsApp Image 2026-10-31 at 16.03.18 (1).jpeg) */}
-        <div className="pt-2 pb-5 px-4 text-center text-white relative">
-          {/* Subtle curved background lines */}
-          <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-          {/* Animated Checkmark Circle with Ripple & Stroke Draw Animation */}
-          <div className="relative w-16 h-16 mx-auto mb-3 flex items-center justify-center">
-            {/* Soft pulse outer ring */}
-            <div className="absolute inset-0 rounded-full bg-white/20 animate-ring-pulse pointer-events-none" />
-            
-            {/* White solid badge with spring pop */}
-            <div className="w-16 h-16 rounded-full bg-white text-[#1078CA] flex items-center justify-center shadow-[0_8px_25px_rgba(0,0,0,0.2)] animate-pop-check z-10">
-              <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
+          {/* Center Checkmark & Title */}
+          <div className="relative z-10 text-center pt-2">
+            {/* White Circular Badge with Vibrant Blue Rounded Checkmark */}
+            <div className="w-16 h-16 rounded-full bg-white text-[#0B7DE6] flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.15)] mx-auto mb-3 animate-pop-check">
+              <svg className="w-8 h-8" viewBox="0 0 48 48" fill="none">
                 <path
                   d="M13 25 L21 33 L35 17"
-                  stroke="#1078CA"
+                  stroke="#0B7DE6"
                   strokeWidth="4.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -51,20 +63,20 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
                 />
               </svg>
             </div>
-          </div>
 
-          <h1 className="text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
-            Transaksi Berhasil
-          </h1>
-          <p className="text-xs text-blue-100 mt-1 font-medium tracking-tight">
-            {displayDateStr}
-          </p>
+            <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-xs">
+              Transaksi Berhasil
+            </h1>
+            <p className="text-xs text-white/90 mt-1 font-medium tracking-tight">
+              {displayDateStr}
+            </p>
+          </div>
         </div>
 
-        {/* Main White Receipt Ticket Card */}
-        <div className="px-4">
-          <div className="bg-white rounded-3xl pt-5 px-5 pb-6 shadow-2xl relative overflow-hidden border border-slate-100">
-            {/* AUTHENTIC BRI WATERMARK PATTERN BACKGROUND (Diagonal tiled BRI Logo + BRI text) */}
+        {/* Overlapping White Receipt Ticket Card */}
+        <div className="px-4 -mt-8 relative z-20 pb-4">
+          <div className="bg-white rounded-3xl pt-5 px-5 pb-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] relative overflow-hidden border border-slate-100">
+            {/* Authentic BRI Diagonal Repeating Watermark Background */}
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none select-none"
               xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +89,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
                   patternUnits="userSpaceOnUse"
                   patternTransform="rotate(-28)"
                 >
-                  <g fill="#1078CA" opacity="0.065">
+                  <g fill="#0B7DE6" opacity="0.055">
                     {/* Official BRI 4-diamond squares emblem */}
                     <rect x="12" y="14" width="4.5" height="4.5" rx="1.2" transform="rotate(45 14.25 16.25)" />
                     <rect x="20" y="14" width="4.5" height="4.5" rx="1.2" transform="rotate(45 22.25 16.25)" />
@@ -116,38 +128,38 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
               <rect width="100%" height="100%" fill="url(#bri-watermark-pattern)" />
             </svg>
 
-            {/* Total Transaksi */}
-            <div className="text-center pb-3 border-b border-slate-100 relative z-10">
+            {/* Total Transaksi Header */}
+            <div className="text-center relative z-10 pb-1">
               <span className="text-xs text-slate-400 font-medium">Total Transaksi</span>
-              <div className="text-2xl font-black text-[#0B4D8C] mt-1 tracking-tight">
+              <div className="text-[26px] font-black text-[#0A3966] mt-0.5 tracking-tight">
                 {formatRupiah(transaction.amount, false)}
               </div>
             </div>
 
-            {/* No. Referensi */}
-            <div className="py-2.5 flex items-center justify-between text-xs border-b border-slate-100 relative z-10">
+            {/* No. Ref Row */}
+            <div className="pt-2 pb-2 flex items-center justify-between text-xs relative z-10">
               <span className="text-slate-400 font-medium">No. Ref</span>
-              <span className="font-mono font-bold text-slate-800 tracking-tight">
+              <span className="font-bold text-slate-800 tracking-tight font-sans">
                 {categoryInfo.referenceDisplay}
               </span>
             </div>
 
-            {/* Inner Bordered Card (from WhatsApp Image 2026-10-31 at 16.03.18 (1).jpeg) */}
-            <div className="mt-3 p-3.5 border border-slate-200/80 rounded-2xl bg-white/70 backdrop-blur-[1px] relative z-10 space-y-3">
+            {/* Inner Bordered Card (Exact match to real screenshot) */}
+            <div className="mt-1 p-3.5 border border-slate-200/90 rounded-2xl bg-white relative z-10 space-y-3">
               {/* Sumber Dana */}
               <div>
                 <span className="text-xs font-bold text-slate-800 block mb-2">
                   Sumber Dana
                 </span>
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-[#1078CA] text-white font-black flex items-center justify-center text-xs flex-shrink-0 shadow-xs">
+                  <div className="w-10 h-10 rounded-full bg-[#0B7DE6] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-xs">
                     HP
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 leading-tight uppercase">
                       {user.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-semibold mt-0.5">BRI</p>
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">BRI</p>
                     <p className="text-[10px] text-slate-400 font-mono">3819 **** **** 532</p>
                   </div>
                 </div>
@@ -155,7 +167,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
 
               <div className="border-t border-slate-100" />
 
-              {/* Tujuan (Specific to E-Wallet, Pulsa/Data, QRIS, BRIVA, Transfer) */}
+              {/* Tujuan */}
               <div>
                 <span className="text-xs font-bold text-slate-800 block mb-2">
                   Tujuan
@@ -168,7 +180,7 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
                     <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
                       {categoryInfo.destinationTitle}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                       {categoryInfo.destinationSubtitle}
                     </p>
                     <p className="text-[10px] text-slate-400 font-mono">
@@ -210,67 +222,64 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
             )}
 
             {/* Toggle: Lihat Detail Transaksi */}
-            <div className="mt-3 pt-2 text-center border-t border-slate-100 relative z-10">
+            <div className="mt-3.5 pt-1 text-center relative z-10">
               <button
                 type="button"
                 onClick={() => setShowFullDetails(!showFullDetails)}
-                className="text-xs font-bold text-[#1078CA] inline-flex items-center space-x-1 active:scale-95 transition-transform"
+                className="text-xs font-bold text-[#0B7DE6] inline-flex items-center space-x-1 active:scale-95 transition-transform"
               >
                 <span>Lihat Detail Transaksi</span>
-                {showFullDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {showFullDetails ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </button>
             </div>
 
-            {/* Perforated ticket edge simulation */}
-            <div className="absolute -bottom-2.5 left-0 right-0 flex justify-between px-2 pointer-events-none">
-              {[...Array(16)].map((_, i) => (
-                <div key={i} className="w-3.5 h-3.5 rounded-full bg-[#1078CA]" />
+            {/* Scalloped ticket cutouts into light background bg-[#F4F7FB] */}
+            <div className="absolute -bottom-2 left-0 right-0 flex justify-between px-1 pointer-events-none">
+              {[...Array(19)].map((_, i) => (
+                <div key={i} className="w-3.5 h-3.5 rounded-full bg-[#F4F7FB]" />
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Section: Produk Pilihan Untukmo (with 'mo' in sky blue) */}
-        <div className="px-4 mt-6">
-          <div className="flex items-center space-x-1 text-white font-bold text-xs mb-2.5">
-            <span>Produk Pilihan Untuk</span>
-            <span className="text-[#38BDF8] font-black">mo</span>
-          </div>
+          {/* Section: Produk Pilihan Untukmo (matches real screenshot) */}
+          <div className="mt-5">
+            <h3 className="text-xs font-bold text-slate-900 mb-2.5">
+              Produk Pilihan Untuk<span className="text-[#0B7DE6] font-black">mo</span>
+            </h3>
 
-          <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
-            {/* Card 1 */}
-            <div className="min-w-[240px] bg-white rounded-2xl p-3 flex items-center space-x-3 shadow-md">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1078CA] flex items-center justify-center font-bold text-xs flex-shrink-0">
-                BRI
+            <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
+              {/* Card 1: Rekening Dana Nasabah (RDN) */}
+              <div className="min-w-[230px] bg-white rounded-2xl p-3 flex items-center space-x-3 shadow-2xs border border-slate-200/60 flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0B7DE6] flex flex-col items-center justify-center font-bold text-[9px] leading-tight flex-shrink-0 border border-blue-100/70">
+                  <span className="font-black text-[#0B7DE6] text-[10px]">BRI</span>
+                  <span className="text-[7px] text-slate-400 -mt-0.5 font-medium">danareksa</span>
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 leading-tight">Rekening Dana Nasabah (RDN)</h4>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Investasi saham mudah & praktis</p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-800 leading-tight">Rekening Dana Nasabah (RDN)</h4>
-                <p className="text-[10px] text-slate-400 mt-0.5">Investasi saham mudah & praktis</p>
-              </div>
-            </div>
 
-            {/* Card 2 */}
-            <div className="min-w-[240px] bg-white rounded-2xl p-3 flex items-center space-x-3 shadow-md">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#1078CA] flex items-center justify-center font-bold text-xs flex-shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="5" width="20" height="14" rx="2" />
-                  <line x1="2" y1="10" x2="22" y2="10" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-800 leading-tight">Tabungan BritAma Rencana</h4>
-                <p className="text-[10px] text-slate-400 mt-0.5">Wujudkan impian masa depanmu</p>
+              {/* Card 2: Tabungan BritAma Rencana */}
+              <div className="min-w-[230px] bg-white rounded-2xl p-3 flex items-center space-x-3 shadow-2xs border border-slate-200/60 flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#0B7DE6] flex items-center justify-center font-bold text-xs flex-shrink-0 border border-sky-100/70">
+                  <CreditCard size={18} className="text-[#0B7DE6]" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 leading-tight">Tabungan BritAma Rencana</h4>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Wujudkan impian masa depanmu</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sticky Bottom Actions: Bagikan & Selesai */}
-      <div className="p-4 bg-white border-t border-slate-100 flex items-center space-x-3 shadow-lg flex-shrink-0">
+      {/* Sticky Bottom Actions: Bagikan & Selesai (Exact styling from screenshot) */}
+      <div className="p-4 bg-white border-t border-slate-200/80 flex items-center space-x-3 flex-shrink-0 shadow-lg pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
         <button
           onClick={() => alert('Bukti transaksi berhasil dibagikan!')}
-          className="flex-1 py-3 bg-white border border-[#1078CA] text-[#1078CA] font-bold text-xs rounded-xl flex items-center justify-center space-x-2 active:scale-98 transition-all"
+          className="flex-1 py-3 bg-white border border-[#0B7DE6] text-[#0B7DE6] font-bold text-xs rounded-xl flex items-center justify-center space-x-2 active:scale-98 transition-all shadow-2xs"
         >
           <Share2 size={16} />
           <span>Bagikan</span>
@@ -278,11 +287,9 @@ export const TransactionReceipt: React.FC<TransactionReceiptProps> = ({
 
         <button
           onClick={onClose}
-          className="flex-1 py-3 bg-[#1078CA] hover:bg-[#0c62a8] text-white font-bold text-xs rounded-xl flex items-center justify-center space-x-2 shadow-md active:scale-98 transition-all"
+          className="flex-1 py-3 bg-[#0B7DE6] hover:bg-[#096ecb] text-white font-bold text-xs rounded-xl flex items-center justify-center space-x-2 shadow-sm active:scale-98 transition-all"
         >
-          <div className="w-4 h-4 rounded-full bg-white text-[#1078CA] flex items-center justify-center">
-            <Check size={12} className="stroke-[3]" />
-          </div>
+          <CheckCircle2 size={16} />
           <span>Selesai</span>
         </button>
       </div>

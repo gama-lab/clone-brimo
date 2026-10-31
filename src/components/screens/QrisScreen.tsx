@@ -117,6 +117,57 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
     };
   }, [step]);
 
+  // Real-time live camera feed QR/Barcode detection with jsQR
+  useEffect(() => {
+    if (!cameraActive || isProcessingQR || maintenanceError) return;
+
+    let animId: number;
+    let isActive = true;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const scanVideoLoop = () => {
+      if (!isActive) return;
+
+      if (
+        videoRef.current &&
+        videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA &&
+        !isProcessingQR &&
+        !maintenanceError
+      ) {
+        const video = videoRef.current;
+        if (video.videoWidth > 0 && video.videoHeight > 0 && ctx) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'dontInvert',
+          });
+
+          if (code && code.data) {
+            // Authentic QR Code detected live from camera!
+            setIsProcessingQR(true);
+            setTimeout(() => {
+              setIsProcessingQR(false);
+              setMaintenanceError(true);
+            }, 2400);
+            return;
+          }
+        }
+      }
+
+      animId = requestAnimationFrame(scanVideoLoop);
+    };
+
+    animId = requestAnimationFrame(scanVideoLoop);
+
+    return () => {
+      isActive = false;
+      cancelAnimationFrame(animId);
+    };
+  }, [cameraActive, isProcessingQR, maintenanceError]);
+
   // Handle Flashlight toggle
   const toggleFlashlight = async () => {
     if (streamRef.current) {

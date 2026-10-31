@@ -12,10 +12,11 @@ import {
   Download,
   Delete,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Search
 } from 'lucide-react';
 import { UserProfile, Beneficiary, Bank, Transaction } from '../../types';
-import { SUPPORTED_BANKS, INITIAL_BENEFICIARIES } from '../../data/mockData';
+import { SUPPORTED_BANKS, INITIAL_BENEFICIARIES, RECENT_TRANSFERS } from '../../data/mockData';
 import { formatRupiah, formatDateIndo, generateRefNo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
 import { TransactionReceipt } from '../common/TransactionReceipt';
@@ -28,48 +29,12 @@ interface TransferScreenProps {
 
 type TransferSubStep = 'home' | 'new_recipient' | 'input_nominal' | 'confirm' | 'pin' | 'receipt';
 
-const KNOWN_ACCOUNTS: Record<string, { name: string; bankId: string; bankName: string; bankCode: string; initials: string; avatarBg: string }> = {
-  '08993782032': {
-    name: 'RICA WIDA JAYANTI',
-    bankId: 'allo',
-    bankName: 'Allo Bank',
-    bankCode: '567',
-    initials: 'RJ',
-    avatarBg: 'bg-indigo-100 text-indigo-700',
-  },
-  '381901048950536': {
-    name: 'RICA WIDA JAYANTI',
-    bankId: 'bri',
-    bankName: 'BANK BRI',
-    bankCode: '002',
-    initials: 'RJ',
-    avatarBg: 'bg-slate-100 text-[#1078CA]',
-  },
-  '305101043541532': {
-    name: 'MANSYUR',
-    bankId: 'bri',
-    bankName: 'BANK BRI',
-    bankCode: '002',
-    initials: 'M',
-    avatarBg: 'bg-slate-100 text-[#1078CA]',
-  },
-  '7302943073': {
-    name: 'Nur intan',
-    bankId: 'bsi',
-    bankName: 'BSI',
-    bankCode: '451',
-    initials: 'NI',
-    avatarBg: 'bg-slate-100 text-[#1078CA]',
-  },
-  '381001017231531': {
-    name: 'ASTRI YUNITA SARI',
-    bankId: 'bri',
-    bankName: 'BANK BRI',
-    bankCode: '002',
-    initials: 'AS',
-    avatarBg: 'bg-slate-100 text-[#1078CA]',
-  },
-};
+// Dynamically index all known beneficiaries for auto-recognition on manual typing
+const KNOWN_ACCOUNTS: Record<string, Beneficiary> = INITIAL_BENEFICIARIES.reduce((acc, ben) => {
+  const clean = ben.accountNumber.replace(/\D/g, '');
+  acc[clean] = ben;
+  return acc;
+}, {} as Record<string, Beneficiary>);
 
 export const TransferScreen: React.FC<TransferScreenProps> = ({
   user,
@@ -79,6 +44,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
   const [subStep, setSubStep] = useState<TransferSubStep>('home');
   const [transferTab, setTransferTab] = useState<'dalam' | 'internasional' | 'emas'>('dalam');
   const [recipientTab, setRecipientTab] = useState<'norek' | 'bifast'>('norek');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Selected recipient
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary>(INITIAL_BENEFICIARIES[0]);
@@ -92,6 +58,17 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
   const detectedRecipient = KNOWN_ACCOUNTS[cleanInputDigits] || (
     cleanInputDigits.includes('08993782032') ? KNOWN_ACCOUNTS['08993782032'] : null
   );
+
+  // Filtered beneficiaries for search
+  const filteredBeneficiaries = INITIAL_BENEFICIARIES.filter((ben) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      ben.name.toLowerCase().includes(q) ||
+      ben.accountNumber.includes(q) ||
+      ben.bankName.toLowerCase().includes(q)
+    );
+  });
 
   // Form Nominal state
   const [saveToBeneficiaries, setSaveToBeneficiaries] = useState(false);
@@ -225,37 +202,59 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                   Emas
                 </button>
               </div>
+
+              {/* Search Bar (Cari nama atau rekening) */}
+              <div className="relative mt-3">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari transaksi tersimpan atau rekening"
+                  className="w-full bg-[#004B87] placeholder:text-white/60 text-white text-xs rounded-full pl-9 pr-8 py-2 focus:outline-none focus:ring-1 focus:ring-white/40"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             </div>
 
           {/* Scrollable Content Body */}
           <div className="flex-1 overflow-y-auto no-scrollbar">
             <div className="p-4 space-y-4">
-              {/* Transfer Terakhir Horizontal Cards */}
-              <div>
-                <h3 className="text-xs font-bold text-slate-800 mb-2">Transfer Terakhir</h3>
-                <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
-                  {INITIAL_BENEFICIARIES.map((ben) => (
-                    <button
-                      key={ben.id}
-                      onClick={() => {
-                        setSelectedBeneficiary(ben);
-                        setNominalAmount('0');
-                        setSubStep('input_nominal');
-                      }}
-                      className="min-w-[210px] bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center space-x-3 shadow-sm hover:border-[#1078CA] transition-all text-left flex-shrink-0"
-                    >
-                      <div className={`w-10 h-10 rounded-full ${ben.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-xs flex-shrink-0`}>
-                        {ben.initials}
-                      </div>
-                      <div className="overflow-hidden">
-                        <h4 className="text-xs font-bold text-slate-800 truncate">{ben.name}</h4>
-                        <p className="text-[11px] text-slate-500 font-medium">{ben.bankName}</p>
-                        <p className="text-[10px] text-slate-400 font-mono">{ben.accountNumber}</p>
-                      </div>
-                    </button>
-                  ))}
+              {/* Transfer Terakhir Horizontal Cards (Only MANSYUR & Nur intan, Allo Bank excluded as requested) */}
+              {!searchQuery && (
+                <div>
+                  <h3 className="text-xs font-bold text-slate-800 mb-2">Transfer Terakhir</h3>
+                  <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
+                    {RECENT_TRANSFERS.map((ben) => (
+                      <button
+                        key={ben.id}
+                        onClick={() => {
+                          setSelectedBeneficiary(ben);
+                          setNominalAmount('0');
+                          setSubStep('input_nominal');
+                        }}
+                        className="min-w-[210px] bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center space-x-3 shadow-sm hover:border-[#1078CA] transition-all text-left flex-shrink-0"
+                      >
+                        <div className={`w-10 h-10 rounded-full ${ben.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-xs flex-shrink-0`}>
+                          {ben.initials}
+                        </div>
+                        <div className="overflow-hidden">
+                          <h4 className="text-xs font-bold text-slate-800 truncate">{ben.name}</h4>
+                          <p className="text-[11px] text-slate-500 font-medium">{ben.bankName}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{ben.accountNumber}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Banner: Pakai Transfer Terjadwal, Yuk! */}
               <div 
@@ -347,6 +346,46 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Daftar Rekening Tersimpan (From WhatsApp Unknown 2026-10-31 at 17.28.33) */}
+              <div>
+                <div className="flex items-center justify-between mb-2 px-0.5">
+                  <h3 className="text-xs font-bold text-slate-800">Daftar Rekening Tersimpan</h3>
+                  <span className="text-[10px] text-slate-400 font-semibold">{filteredBeneficiaries.length} Kontak</span>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 shadow-xs overflow-hidden">
+                  {filteredBeneficiaries.length > 0 ? (
+                    filteredBeneficiaries.map((ben) => (
+                      <button
+                        key={ben.id}
+                        onClick={() => {
+                          setSelectedBeneficiary(ben);
+                          setNominalAmount('0');
+                          setSubStep('input_nominal');
+                        }}
+                        className="w-full p-3 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors text-left"
+                      >
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className={`w-10 h-10 rounded-full ${ben.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-xs flex-shrink-0`}>
+                            {ben.initials}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-slate-900 truncate">{ben.name}</h4>
+                            <p className="text-[11px] text-slate-500 font-medium">{ben.bankName}</p>
+                            <p className="text-[10px] text-slate-400 font-mono">{ben.accountNumber}</p>
+                          </div>
+                        </div>
+                        <ChevronRight size={16} className="text-slate-300 flex-shrink-0" />
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-6 text-center text-slate-400 text-xs">
+                      Tidak ada rekening yang sesuai dengan "{searchQuery}"
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -447,7 +486,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                         const allo = SUPPORTED_BANKS.find(b => b.id === 'allo');
                         if (allo) setTargetBank(allo);
                       } else if (KNOWN_ACCOUNTS[digits]) {
-                        const matched = SUPPORTED_BANKS.find(b => b.id === KNOWN_ACCOUNTS[digits].bankId);
+                        const target = KNOWN_ACCOUNTS[digits];
+                        const matched = SUPPORTED_BANKS.find(b => b.code === target.bankCode || b.name === target.bankName);
                         if (matched) setTargetBank(matched);
                       }
                     }}
