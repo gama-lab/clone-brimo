@@ -728,9 +728,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* FULL-SCREEN FROSTED GLASS BLURRED PIN UI (User Rule: full layar tapi ngeblur, tombol X di kiri atas, lalu tombol2 numpad) */}
+      {/* FULL-SCREEN SEMI-BLUR FROSTED GLASS PIN UI (User Rule: semi2 blur, ga terlalu putih dan ga terlalu hitam, tombol putih teks hitam) */}
       {showPinModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-xl flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
+        <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-md flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
           {/* Top Bar with X button on TOP LEFT */}
           <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-between">
             <button
@@ -740,32 +740,25 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                 setPin('');
                 setPinErrorMsg('');
               }}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-white transition-all backdrop-blur-md"
+              className="w-10 h-10 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/60 active:scale-95 flex items-center justify-center text-slate-900 shadow-md transition-all"
               title="Tutup PIN"
             >
-              <X size={22} />
+              <X size={20} className="stroke-[2.5]" />
             </button>
-            <span className="text-xs font-bold text-white/70 tracking-widest uppercase">
+            <span className="text-xs font-bold text-white/90 drop-shadow-sm tracking-widest uppercase">
               PIN Transaksi
             </span>
             <div className="w-10" />
           </div>
 
-          {/* Center Area: Title, Target Pill, 6 PIN Bullets */}
+          {/* Center Area: Title & 6 PIN Bullets (Tanpa keterangan penerima & nominal) */}
           <div className="text-center my-auto py-2">
-            <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-sm">
+            <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-md">
               Masukkan PIN BRImo
             </h2>
-            <p className="text-xs text-white/80 mt-1 font-medium">
+            <p className="text-xs text-white/90 mt-1.5 font-medium drop-shadow-sm">
               Jaga kerahasiaan PIN Anda
             </p>
-
-            {/* Target beneficiary & nominal pill */}
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-1.5 rounded-full mt-4 text-xs font-semibold shadow-xs">
-              <span className="text-white/80">{selectedBeneficiary.name}</span>
-              <span className="text-white/30">•</span>
-              <span className="text-[#38BDF8] font-bold">{formatRupiah(numAmount + adminFee)}</span>
-            </div>
 
             {/* 6 PIN Bullets */}
             <div className="flex items-center justify-center space-x-4 mt-8">
@@ -776,8 +769,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                     pinErrorMsg
                       ? 'bg-rose-500 border-rose-500 animate-shake'
                       : pin.length > idx
-                      ? 'bg-white border-white scale-110 shadow-[0_0_12px_rgba(255,255,255,0.85)]'
-                      : 'border-white/40 bg-white/10 backdrop-blur-sm'
+                      ? 'bg-white border-white scale-110 shadow-[0_0_12px_rgba(255,255,255,0.9)]'
+                      : 'border-white/60 bg-white/20 backdrop-blur-xs'
                   }`}
                 />
               ))}
@@ -785,13 +778,13 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
 
             {/* Error text if wrong PIN */}
             {pinErrorMsg && (
-              <p className="text-xs font-bold text-rose-400 mt-3 animate-in fade-in">
+              <p className="text-xs font-bold text-rose-300 drop-shadow mt-3 animate-in fade-in">
                 {pinErrorMsg}
               </p>
             )}
           </div>
 
-          {/* Bottom Area: Frosted Glass Numpad Keypad (1-9, 0, Backspace) */}
+          {/* Bottom Area: Semi-frosted White Numpad Buttons with Black Text */}
           <div className="max-w-xs mx-auto w-full pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
             <div className="grid grid-cols-3 gap-y-4 gap-x-6 text-center">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
@@ -799,7 +792,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                   key={digit}
                   type="button"
                   onClick={() => handleKeypadPress(digit)}
-                  className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                  className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
                 >
                   {digit}
                 </button>
@@ -808,17 +801,17 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
-                className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
               >
                 0
               </button>
               <button
                 type="button"
                 onClick={handleKeypadDelete}
-                className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
                 title="Hapus Digit"
               >
-                <Delete size={22} className="text-white" />
+                <Delete size={22} className="text-slate-900" />
               </button>
             </div>
           </div>
