@@ -28,6 +28,49 @@ interface TransferScreenProps {
 
 type TransferSubStep = 'home' | 'new_recipient' | 'input_nominal' | 'confirm' | 'pin' | 'receipt';
 
+const KNOWN_ACCOUNTS: Record<string, { name: string; bankId: string; bankName: string; bankCode: string; initials: string; avatarBg: string }> = {
+  '08993782032': {
+    name: 'RICA WIDA JAYANTI',
+    bankId: 'allo',
+    bankName: 'Allo Bank',
+    bankCode: '567',
+    initials: 'RJ',
+    avatarBg: 'bg-indigo-100 text-indigo-700',
+  },
+  '381901048950536': {
+    name: 'RICA WIDA JAYANTI',
+    bankId: 'bri',
+    bankName: 'BANK BRI',
+    bankCode: '002',
+    initials: 'RJ',
+    avatarBg: 'bg-slate-100 text-[#1078CA]',
+  },
+  '305101043541532': {
+    name: 'MANSYUR',
+    bankId: 'bri',
+    bankName: 'BANK BRI',
+    bankCode: '002',
+    initials: 'M',
+    avatarBg: 'bg-slate-100 text-[#1078CA]',
+  },
+  '7302943073': {
+    name: 'Nur intan',
+    bankId: 'bsi',
+    bankName: 'BSI',
+    bankCode: '451',
+    initials: 'NI',
+    avatarBg: 'bg-slate-100 text-[#1078CA]',
+  },
+  '381001017231531': {
+    name: 'ASTRI YUNITA SARI',
+    bankId: 'bri',
+    bankName: 'BANK BRI',
+    bankCode: '002',
+    initials: 'AS',
+    avatarBg: 'bg-slate-100 text-[#1078CA]',
+  },
+};
+
 export const TransferScreen: React.FC<TransferScreenProps> = ({
   user,
   onBack,
@@ -43,6 +86,12 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
   // Form New Recipient state
   const [targetBank, setTargetBank] = useState<Bank>(SUPPORTED_BANKS[0]);
   const [targetAccountNumber, setTargetAccountNumber] = useState('');
+
+  // Clean input and auto-detect recipient
+  const cleanInputDigits = targetAccountNumber.replace(/\D/g, '');
+  const detectedRecipient = KNOWN_ACCOUNTS[cleanInputDigits] || (
+    cleanInputDigits.includes('08993782032') ? KNOWN_ACCOUNTS['08993782032'] : null
+  );
 
   // Form Nominal state
   const [saveToBeneficiaries, setSaveToBeneficiaries] = useState(false);
@@ -185,7 +234,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
               <div>
                 <h3 className="text-xs font-bold text-slate-800 mb-2">Transfer Terakhir</h3>
                 <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
-                  {INITIAL_BENEFICIARIES.slice(0, 2).map((ben) => (
+                  {INITIAL_BENEFICIARIES.map((ben) => (
                     <button
                       key={ben.id}
                       onClick={() => {
@@ -193,9 +242,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                         setNominalAmount('0');
                         setSubStep('input_nominal');
                       }}
-                      className="min-w-[210px] bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center space-x-3 shadow-sm hover:border-[#1078CA] transition-all text-left"
+                      className="min-w-[210px] bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center space-x-3 shadow-sm hover:border-[#1078CA] transition-all text-left flex-shrink-0"
                     >
-                      <div className="w-10 h-10 rounded-full bg-slate-100 text-[#1078CA] font-bold flex items-center justify-center text-xs flex-shrink-0">
+                      <div className={`w-10 h-10 rounded-full ${ben.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-xs flex-shrink-0`}>
                         {ben.initials}
                       </div>
                       <div className="overflow-hidden">
@@ -390,14 +439,47 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                   <input
                     type="text"
                     value={targetAccountNumber}
-                    onChange={(e) => setTargetAccountNumber(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setTargetAccountNumber(val);
+                      const digits = val.replace(/\D/g, '');
+                      if (digits === '08993782032' || digits.includes('08993782032')) {
+                        const allo = SUPPORTED_BANKS.find(b => b.id === 'allo');
+                        if (allo) setTargetBank(allo);
+                      } else if (KNOWN_ACCOUNTS[digits]) {
+                        const matched = SUPPORTED_BANKS.find(b => b.id === KNOWN_ACCOUNTS[digits].bankId);
+                        if (matched) setTargetBank(matched);
+                      }
+                    }}
                     placeholder="Masukkan nomor rekening atau alias"
                     className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-[#1078CA]"
                   />
                 </div>
-                <span className="text-[10px] text-slate-400 block mt-1 pl-1">
-                  Masukkan alias diawali dengan "@"
-                </span>
+                {detectedRecipient ? (
+                  <div className="mt-2.5 bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-1 duration-200 shadow-xs">
+                    <div className="flex items-center space-x-2.5">
+                      <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-xs ${detectedRecipient.avatarBg}`}>
+                        {detectedRecipient.initials}
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-1.5">
+                          <span className="text-xs font-bold text-slate-900">{detectedRecipient.name}</span>
+                          <CheckCircle2 size={13} className="text-emerald-600 flex-shrink-0" />
+                        </div>
+                        <p className="text-[10px] text-slate-500 font-medium">
+                          {detectedRecipient.bankName} • {targetAccountNumber}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      Terbaca
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[10px] text-slate-400 block mt-1 pl-1">
+                    Masukkan alias diawali dengan "@"
+                  </span>
+                )}
               </div>
 
               {/* Info Note: Alias digunakan sebagai alternatif */}
@@ -417,14 +499,23 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                   alert('Silakan masukkan nomor rekening tujuan!');
                   return;
                 }
+                const clean = targetAccountNumber.replace(/\D/g, '');
+                const matched = detectedRecipient || (targetBank.id === 'allo' ? KNOWN_ACCOUNTS['08993782032'] : null);
+
+                const resolvedName = matched ? matched.name : (targetBank.id === 'allo' ? 'RICA WIDA JAYANTI' : 'MANSYUR');
+                const resolvedBankName = matched ? matched.bankName : targetBank.name;
+                const resolvedBankCode = matched ? matched.bankCode : targetBank.code;
+                const resolvedInitials = matched ? matched.initials : (resolvedName === 'RICA WIDA JAYANTI' ? 'RJ' : 'M');
+                const resolvedAvatarBg = matched ? matched.avatarBg : (targetBank.id === 'allo' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-[#1078CA]');
+
                 const newB: Beneficiary = {
                   id: `ben-${Date.now()}`,
-                  name: 'MANSYUR',
+                  name: resolvedName,
                   accountNumber: targetAccountNumber,
-                  bankName: targetBank.name,
-                  bankCode: targetBank.code,
-                  initials: 'M',
-                  avatarBg: 'bg-slate-100 text-[#1078CA]',
+                  bankName: resolvedBankName,
+                  bankCode: resolvedBankCode,
+                  initials: resolvedInitials,
+                  avatarBg: resolvedAvatarBg,
                 };
                 setSelectedBeneficiary(newB);
                 setNominalAmount('0');
@@ -457,7 +548,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
           <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3.5">
               {/* Beneficiary Header */}
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-sm flex items-center space-x-3">
-                <div className="w-11 h-11 rounded-full bg-slate-100 text-[#1078CA] font-bold flex items-center justify-center text-sm">
+                <div className={`w-11 h-11 rounded-full ${selectedBeneficiary.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-sm flex-shrink-0`}>
                   {selectedBeneficiary.initials}
                 </div>
                 <div>

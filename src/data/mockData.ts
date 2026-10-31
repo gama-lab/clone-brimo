@@ -11,6 +11,15 @@ export const INITIAL_USER: UserProfile = {
 
 export const INITIAL_BENEFICIARIES: Beneficiary[] = [
   {
+    id: 'ben-allo-1',
+    name: 'RICA WIDA JAYANTI',
+    accountNumber: '08993782032',
+    bankName: 'Allo Bank',
+    bankCode: '567',
+    initials: 'RJ',
+    avatarBg: 'bg-indigo-100 text-indigo-700',
+  },
+  {
     id: 'ben-1',
     name: 'MANSYUR',
     accountNumber: '305101043541532',
