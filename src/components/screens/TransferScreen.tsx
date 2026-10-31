@@ -70,6 +70,54 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     );
   });
 
+  // Loading state when selecting recipient or confirming new recipient
+  const [isLoadingRecipient, setIsLoadingRecipient] = useState(false);
+  const [recipientLoadingText, setRecipientLoadingText] = useState('Memuat data rekening...');
+
+  const handleSelectRecipientWithLoading = (ben: Beneficiary) => {
+    setSelectedBeneficiary(ben);
+    setNominalAmount('0');
+    setRecipientLoadingText('Memeriksa Rekening...');
+    setIsLoadingRecipient(true);
+    setTimeout(() => {
+      setIsLoadingRecipient(false);
+      setSubStep('input_nominal');
+    }, 650);
+  };
+
+  const handleAddNewRecipientWithLoading = () => {
+    if (!targetAccountNumber.trim()) {
+      alert('Silakan masukkan nomor rekening tujuan!');
+      return;
+    }
+    const clean = targetAccountNumber.replace(/\D/g, '');
+    const matched = detectedRecipient || KNOWN_ACCOUNTS[clean] || (targetBank.id === 'allo' ? KNOWN_ACCOUNTS['08993782032'] : null);
+
+    const resolvedName = matched ? matched.name : (targetBank.id === 'allo' ? 'RICA WIDA JAYANTI' : 'MANSYUR');
+    const resolvedBankName = matched ? matched.bankName : targetBank.name;
+    const resolvedBankCode = matched ? matched.bankCode : targetBank.code;
+    const resolvedInitials = matched ? matched.initials : (resolvedName === 'RICA WIDA JAYANTI' ? 'RJ' : 'M');
+    const resolvedAvatarBg = matched ? matched.avatarBg : (targetBank.id === 'allo' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-[#1078CA]');
+
+    const newB: Beneficiary = {
+      id: `ben-${Date.now()}`,
+      name: resolvedName,
+      accountNumber: targetAccountNumber,
+      bankName: resolvedBankName,
+      bankCode: resolvedBankCode,
+      initials: resolvedInitials,
+      avatarBg: resolvedAvatarBg,
+    };
+    setSelectedBeneficiary(newB);
+    setNominalAmount('0');
+    setRecipientLoadingText('Memverifikasi Rekening Tujuan...');
+    setIsLoadingRecipient(true);
+    setTimeout(() => {
+      setIsLoadingRecipient(false);
+      setSubStep('input_nominal');
+    }, 800);
+  };
+
   // Form Nominal state
   const [saveToBeneficiaries, setSaveToBeneficiaries] = useState(false);
   const [transferMethod, setTransferMethod] = useState<'bifast' | 'online'>('bifast');
@@ -235,11 +283,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                     {RECENT_TRANSFERS.map((ben) => (
                       <button
                         key={ben.id}
-                        onClick={() => {
-                          setSelectedBeneficiary(ben);
-                          setNominalAmount('0');
-                          setSubStep('input_nominal');
-                        }}
+                        onClick={() => handleSelectRecipientWithLoading(ben)}
                         className="min-w-[210px] bg-white border border-slate-200/80 rounded-2xl p-3 flex items-center space-x-3 shadow-sm hover:border-[#1078CA] transition-all text-left flex-shrink-0"
                       >
                         <div className={`w-10 h-10 rounded-full ${ben.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-xs flex-shrink-0`}>
@@ -361,11 +405,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                     filteredBeneficiaries.map((ben) => (
                       <button
                         key={ben.id}
-                        onClick={() => {
-                          setSelectedBeneficiary(ben);
-                          setNominalAmount('0');
-                          setSubStep('input_nominal');
-                        }}
+                        onClick={() => handleSelectRecipientWithLoading(ben)}
                         className="w-full p-3 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors text-left"
                       >
                         <div className="flex items-center space-x-3 min-w-0">
@@ -534,33 +574,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
           {/* Pinned Bottom Button: Lanjutkan (Zero excess margin, pinned directly to the bottom) */}
           <div className="p-4 bg-white border-t border-slate-100 flex-shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
             <button
-              onClick={() => {
-                if (!targetAccountNumber) {
-                  alert('Silakan masukkan nomor rekening tujuan!');
-                  return;
-                }
-                const clean = targetAccountNumber.replace(/\D/g, '');
-                const matched = detectedRecipient || (targetBank.id === 'allo' ? KNOWN_ACCOUNTS['08993782032'] : null);
-
-                const resolvedName = matched ? matched.name : (targetBank.id === 'allo' ? 'RICA WIDA JAYANTI' : 'MANSYUR');
-                const resolvedBankName = matched ? matched.bankName : targetBank.name;
-                const resolvedBankCode = matched ? matched.bankCode : targetBank.code;
-                const resolvedInitials = matched ? matched.initials : (resolvedName === 'RICA WIDA JAYANTI' ? 'RJ' : 'M');
-                const resolvedAvatarBg = matched ? matched.avatarBg : (targetBank.id === 'allo' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-[#1078CA]');
-
-                const newB: Beneficiary = {
-                  id: `ben-${Date.now()}`,
-                  name: resolvedName,
-                  accountNumber: targetAccountNumber,
-                  bankName: resolvedBankName,
-                  bankCode: resolvedBankCode,
-                  initials: resolvedInitials,
-                  avatarBg: resolvedAvatarBg,
-                };
-                setSelectedBeneficiary(newB);
-                setNominalAmount('0');
-                setSubStep('input_nominal');
-              }}
+              onClick={handleAddNewRecipientWithLoading}
               className="w-full py-3.5 bg-[#1078CA] hover:bg-[#0d64a8] text-white font-bold text-sm rounded-xl shadow-md active:scale-[0.99] transition-all"
             >
               Lanjutkan
@@ -942,6 +956,19 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
               >
                 <Delete size={22} className="text-slate-900" />
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RECIPIENT SELECTION LOADING OVERLAY (Ala BRImo) */}
+      {isLoadingRecipient && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
+          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 border-4 border-[#1078CA]/20 border-t-[#1078CA] rounded-full animate-spin mx-auto" />
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">{recipientLoadingText}</h3>
+              <p className="text-xs text-slate-500 mt-1">Sedang menghubungkan ke sistem perbankan</p>
             </div>
           </div>
         </div>
