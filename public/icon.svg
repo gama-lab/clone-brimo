@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1484DD"/>
+      <stop offset="100%" stop-color="#0A5EA3"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#bgGrad)"/>
+  <g text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="900">
+    <text x="256" y="275" font-size="205" fill="#FFFFFF" letter-spacing="-6">BRI</text>
+    <text x="256" y="420" font-size="160" fill="#38BDF8" letter-spacing="-3">mo</text>
+  </g>
+</svg>
