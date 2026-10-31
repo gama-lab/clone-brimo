@@ -72,17 +72,15 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
 
   // Loading state when selecting recipient or confirming new recipient
   const [isLoadingRecipient, setIsLoadingRecipient] = useState(false);
-  const [recipientLoadingText, setRecipientLoadingText] = useState('Memuat data rekening...');
 
   const handleSelectRecipientWithLoading = (ben: Beneficiary) => {
     setSelectedBeneficiary(ben);
     setNominalAmount('0');
-    setRecipientLoadingText('Memeriksa Rekening...');
     setIsLoadingRecipient(true);
     setTimeout(() => {
       setIsLoadingRecipient(false);
       setSubStep('input_nominal');
-    }, 650);
+    }, 500);
   };
 
   const handleAddNewRecipientWithLoading = () => {
@@ -110,12 +108,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     };
     setSelectedBeneficiary(newB);
     setNominalAmount('0');
-    setRecipientLoadingText('Memverifikasi Rekening Tujuan...');
     setIsLoadingRecipient(true);
     setTimeout(() => {
       setIsLoadingRecipient(false);
       setSubStep('input_nominal');
-    }, 800);
+    }, 600);
   };
 
   // Form Nominal state
@@ -961,15 +958,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* RECIPIENT SELECTION LOADING OVERLAY (Ala BRImo) */}
+      {/* PURE LOADING SPINNER ANIMATION ONLY (No text) */}
       {isLoadingRecipient && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
-          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3.5 animate-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 border-4 border-[#1078CA]/20 border-t-[#1078CA] rounded-full animate-spin mx-auto" />
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">{recipientLoadingText}</h3>
-              <p className="text-xs text-slate-500 mt-1">Sedang menghubungkan ke sistem perbankan</p>
-            </div>
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
+          <div className="w-16 h-16 bg-white/95 rounded-2xl shadow-xl flex items-center justify-center border border-white/40">
+            <div className="w-8 h-8 border-3 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
           </div>
         </div>
       )}
