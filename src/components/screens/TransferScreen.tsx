@@ -728,109 +728,98 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* BLURRED PIN MODAL OVERLAY (User Rule: tetap di page masukkan nominal tapi muncul ngeblur dengan tombol2 PIN) */}
+      {/* FULL-SCREEN FROSTED GLASS BLURRED PIN UI (User Rule: full layar tapi ngeblur, tombol X di kiri atas, lalu tombol2 numpad) */}
       {showPinModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex flex-col justify-end animate-in fade-in duration-200 select-none">
-          {/* Backdrop click to dismiss */}
-          <div
-            className="flex-1"
-            onClick={() => {
-              setShowPinModal(false);
-              setPin('');
-            }}
-          />
+        <div className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-xl flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
+          {/* Top Bar with X button on TOP LEFT */}
+          <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                setShowPinModal(false);
+                setPin('');
+                setPinErrorMsg('');
+              }}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-white transition-all backdrop-blur-md"
+              title="Tutup PIN"
+            >
+              <X size={22} />
+            </button>
+            <span className="text-xs font-bold text-white/70 tracking-widest uppercase">
+              PIN Transaksi
+            </span>
+            <div className="w-10" />
+          </div>
 
-          {/* Slide-up PIN Sheet */}
-          <div className="bg-white rounded-t-3xl pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))] px-6 shadow-2xl animate-sheet-up">
-            {/* Top Drag Indicator */}
-            <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3" />
+          {/* Center Area: Title, Target Pill, 6 PIN Bullets */}
+          <div className="text-center my-auto py-2">
+            <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-sm">
+              Masukkan PIN BRImo
+            </h2>
+            <p className="text-xs text-white/80 mt-1 font-medium">
+              Jaga kerahasiaan PIN Anda
+            </p>
 
-            {/* Header with Title & Close Button */}
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Masukkan PIN BRImo</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Jaga kerahasiaan PIN transaksi Anda</p>
-              </div>
+            {/* Target beneficiary & nominal pill */}
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-1.5 rounded-full mt-4 text-xs font-semibold shadow-xs">
+              <span className="text-white/80">{selectedBeneficiary.name}</span>
+              <span className="text-white/30">•</span>
+              <span className="text-[#38BDF8] font-bold">{formatRupiah(numAmount + adminFee)}</span>
+            </div>
+
+            {/* 6 PIN Bullets */}
+            <div className="flex items-center justify-center space-x-4 mt-8">
+              {[0, 1, 2, 3, 4, 5].map((idx) => (
+                <div
+                  key={idx}
+                  className={`w-4 h-4 rounded-full border-2 transition-all duration-150 ${
+                    pinErrorMsg
+                      ? 'bg-rose-500 border-rose-500 animate-shake'
+                      : pin.length > idx
+                      ? 'bg-white border-white scale-110 shadow-[0_0_12px_rgba(255,255,255,0.85)]'
+                      : 'border-white/40 bg-white/10 backdrop-blur-sm'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Error text if wrong PIN */}
+            {pinErrorMsg && (
+              <p className="text-xs font-bold text-rose-400 mt-3 animate-in fade-in">
+                {pinErrorMsg}
+              </p>
+            )}
+          </div>
+
+          {/* Bottom Area: Frosted Glass Numpad Keypad (1-9, 0, Backspace) */}
+          <div className="max-w-xs mx-auto w-full pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
+            <div className="grid grid-cols-3 gap-y-4 gap-x-6 text-center">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+                <button
+                  key={digit}
+                  type="button"
+                  onClick={() => handleKeypadPress(digit)}
+                  className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                >
+                  {digit}
+                </button>
+              ))}
+              <div className="w-16 h-16" />
               <button
                 type="button"
-                onClick={() => {
-                  setShowPinModal(false);
-                  setPin('');
-                }}
-                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center active:scale-95 transition-all"
+                onClick={() => handleKeypadPress('0')}
+                className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
               >
-                <X size={18} />
+                0
               </button>
-            </div>
-
-            {/* Transfer Summary Badge Strip */}
-            <div className="my-3 py-2 px-3 bg-blue-50/70 rounded-xl border border-blue-100 flex items-center justify-between text-xs">
-              <div>
-                <span className="text-[10px] text-slate-400 block font-medium">Tujuan Transfer</span>
-                <span className="font-bold text-slate-800 truncate max-w-[170px] block">
-                  {selectedBeneficiary.name}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[10px] text-slate-400 block font-medium">Total</span>
-                <span className="font-black text-[#1078CA]">
-                  {formatRupiah(numAmount + adminFee)}
-                </span>
-              </div>
-            </div>
-
-            {/* PIN Dots (6 Bullets) */}
-            <div className="flex flex-col items-center justify-center my-4">
-              <div className="flex items-center justify-center space-x-3.5">
-                {[0, 1, 2, 3, 4, 5].map((idx) => (
-                  <div
-                    key={idx}
-                    className={`w-3.5 h-3.5 rounded-full border-2 transition-all ${
-                      pinErrorMsg
-                        ? 'bg-rose-500 border-rose-500'
-                        : pin.length > idx
-                        ? 'bg-[#1078CA] border-[#1078CA] scale-110 shadow-xs'
-                        : 'border-slate-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              {pinErrorMsg && (
-                <p className="text-xs font-bold text-rose-500 mt-2 text-center animate-in fade-in">
-                  {pinErrorMsg}
-                </p>
-              )}
-            </div>
-
-            {/* Numeric Keypad (1-9, 0, Backspace) */}
-            <div className="max-w-xs mx-auto w-full pt-1 pb-1">
-              <div className="grid grid-cols-3 gap-y-3 gap-x-6 text-center">
-                {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                  <button
-                    key={digit}
-                    type="button"
-                    onClick={() => handleKeypadPress(digit)}
-                    className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 active:bg-blue-100 font-bold text-xl text-slate-800 mx-auto flex items-center justify-center transition-colors active:scale-95 shadow-xs"
-                  >
-                    {digit}
-                  </button>
-                ))}
-                <div className="w-16 h-16" />
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('0')}
-                  className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 active:bg-blue-100 font-bold text-xl text-slate-800 mx-auto flex items-center justify-center transition-colors active:scale-95 shadow-xs"
-                >
-                  0
-                </button>
-                <button
-                  type="button"
-                  onClick={handleKeypadDelete}
-                  className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 active:bg-rose-50 text-slate-700 hover:text-rose-600 mx-auto flex items-center justify-center active:scale-95 transition-colors shadow-xs"
-                >
-                  <Delete size={20} />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleKeypadDelete}
+                className="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/35 backdrop-blur-lg border border-white/10 text-white mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                title="Hapus Digit"
+              >
+                <Delete size={22} className="text-white" />
+              </button>
             </div>
           </div>
         </div>
