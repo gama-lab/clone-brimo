@@ -731,24 +731,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
       {/* FULL-SCREEN SEMI-BLUR FROSTED GLASS PIN UI (User Rule: semi2 blur, ga terlalu putih dan ga terlalu hitam, tombol putih teks hitam) */}
       {showPinModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-md flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
-          {/* Top Bar with X button on TOP LEFT */}
-          <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => {
-                setShowPinModal(false);
-                setPin('');
-                setPinErrorMsg('');
-              }}
-              className="w-10 h-10 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/60 active:scale-95 flex items-center justify-center text-slate-900 shadow-md transition-all"
-              title="Tutup PIN"
-            >
-              <X size={20} className="stroke-[2.5]" />
-            </button>
+          {/* Top Bar Header */}
+          <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-center">
             <span className="text-xs font-bold text-white/90 drop-shadow-sm tracking-widest uppercase">
               PIN Transaksi
             </span>
-            <div className="w-10" />
           </div>
 
           {/* Center Area: Title & 6 PIN Bullets (Tanpa keterangan penerima & nominal) */}
@@ -797,7 +784,18 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                   {digit}
                 </button>
               ))}
-              <div className="w-16 h-16" />
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPinModal(false);
+                  setPin('');
+                  setPinErrorMsg('');
+                }}
+                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
+                title="Batal / Tutup PIN"
+              >
+                <X size={22} className="stroke-[2.5]" />
+              </button>
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
