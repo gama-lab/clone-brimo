@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Screen, UserProfile, Transaction } from './types';
 import { INITIAL_USER, INITIAL_TRANSACTIONS } from './data/mockData';
 import { LoginScreen } from './components/screens/LoginScreen';
@@ -10,12 +10,33 @@ import { AktivitasScreen } from './components/screens/AktivitasScreen';
 import { AccountScreen } from './components/screens/AccountScreen';
 import { BottomNav } from './components/common/BottomNav';
 import { HomeSkeleton, MutasiSkeleton, AktivitasSkeleton } from './components/common/ScreenSkeletons';
+import { BrimoAlertModal, BrimoAlertData } from './components/common/BrimoAlertModal';
 
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('login');
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [isScreenLoading, setIsScreenLoading] = useState(false);
+  const [alertData, setAlertData] = useState<BrimoAlertData>({
+    isOpen: false,
+    title: '',
+  });
+
+  // Global override of browser alert to custom authentic BRImo alert modal
+  useEffect(() => {
+    const originalAlert = window.alert;
+    window.alert = (message?: any) => {
+      const msgStr = String(message ?? '');
+      setAlertData({
+        isOpen: true,
+        title: msgStr,
+      });
+    };
+
+    return () => {
+      window.alert = originalAlert;
+    };
+  }, []);
 
   // Navigate handler with smooth realistic skeleton shimmer transition
   const handleNavigate = (screen: Screen) => {
@@ -138,6 +159,12 @@ export const App: React.FC = () => {
           />
         </div>
       )}
+
+      {/* Global Custom BRImo Alert Modal (replaces all native browser alerts) */}
+      <BrimoAlertModal
+        data={alertData}
+        onClose={() => setAlertData(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

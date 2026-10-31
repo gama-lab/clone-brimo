@@ -70,6 +70,16 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     );
   });
 
+  // Bank selection bottom sheet modal state
+  const [showBankSheet, setShowBankSheet] = useState(false);
+  const [bankSearch, setBankSearch] = useState('');
+
+  const filteredBankList = SUPPORTED_BANKS.filter((b) => {
+    if (!bankSearch.trim()) return true;
+    const q = bankSearch.toLowerCase();
+    return b.name.toLowerCase().includes(q) || b.code.includes(q);
+  });
+
   // Loading state when selecting recipient or confirming new recipient
   const [isLoadingRecipient, setIsLoadingRecipient] = useState(false);
 
@@ -80,7 +90,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     setTimeout(() => {
       setIsLoadingRecipient(false);
       setSubStep('input_nominal');
-    }, 500);
+    }, 700);
   };
 
   const handleAddNewRecipientWithLoading = () => {
@@ -487,24 +497,20 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
 
           {/* Scrollable Form */}
           <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
-              {/* Bank Tujuan */}
+              {/* Bank Tujuan (Click to open Daftar Bank bottom sheet modal, exact match to media_1793440655584_f7c42ff3.png) */}
               <div>
                 <label className="text-xs font-bold text-slate-800 block mb-1.5">Bank Tujuan</label>
-                <div className="relative">
-                  <select
-                    value={targetBank.id}
-                    onChange={(e) => {
-                      const found = SUPPORTED_BANKS.find(x => x.id === e.target.value);
-                      if (found) setTargetBank(found);
-                    }}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-3 text-xs font-bold text-slate-800 appearance-none focus:outline-none focus:border-[#1078CA]"
-                  >
-                    {SUPPORTED_BANKS.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBankSheet(true)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-3 text-xs font-bold text-slate-800 flex items-center justify-between text-left focus:outline-none focus:border-[#1078CA] shadow-2xs active:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-2.5 min-w-0">
+                    <Building2 size={16} className="text-slate-600 flex-shrink-0" />
+                    <span className="truncate uppercase font-bold">{targetBank.name}</span>
+                  </div>
+                  <ChevronDown size={18} className="text-[#1078CA] flex-shrink-0" />
+                </button>
               </div>
 
               {/* Nomor Rekening / Alias */}
@@ -958,11 +964,72 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
+      {/* DAFTAR BANK BOTTOM SHEET MODAL (Exact match to user reference media_1793440655584_f7c42ff3.png) */}
+      {showBankSheet && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex flex-col justify-end select-none animate-in fade-in duration-200">
+          <div className="bg-white rounded-t-3xl max-h-[82vh] flex flex-col shadow-2xl animate-sheet-up">
+            {/* Top Drag Handle */}
+            <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mt-2.5 mb-2" />
+            
+            {/* Title */}
+            <h3 className="text-sm font-bold text-slate-900 text-center pb-2.5">Daftar Bank</h3>
+
+            {/* Search Bank Input */}
+            <div className="px-4 pb-2.5">
+              <div className="relative flex items-center bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus-within:border-[#1078CA]">
+                <Search size={16} className="text-slate-400 mr-2 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={bankSearch}
+                  onChange={(e) => setBankSearch(e.target.value)}
+                  placeholder="Cari bank disini..."
+                  className="w-full text-xs font-medium text-slate-800 focus:outline-none placeholder:text-slate-400"
+                />
+                {bankSearch && (
+                  <button onClick={() => setBankSearch('')} className="text-slate-400 hover:text-slate-600">
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Scrollable Bank List */}
+            <div className="flex-1 overflow-y-auto px-4 divide-y divide-slate-100 no-scrollbar">
+              {filteredBankList.length > 0 ? (
+                filteredBankList.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => {
+                      setTargetBank(b);
+                      setShowBankSheet(false);
+                      setBankSearch('');
+                    }}
+                    className={`w-full py-3.5 text-left text-xs font-bold transition-colors uppercase ${
+                      targetBank.id === b.id ? 'text-[#1078CA]' : 'text-slate-800 hover:text-[#1078CA]'
+                    }`}
+                  >
+                    {b.name}
+                  </button>
+                ))
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-400">
+                  Bank tidak ditemukan
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Safe Area */}
+            <div className="h-[max(1rem,env(safe-area-inset-bottom,1rem))] bg-white flex-shrink-0" />
+          </div>
+        </div>
+      )}
+
       {/* PURE LOADING SPINNER ANIMATION ONLY (No text) */}
       {isLoadingRecipient && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
-          <div className="w-16 h-16 bg-white/95 rounded-2xl shadow-xl flex items-center justify-center border border-white/40">
-            <div className="w-8 h-8 border-3 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
+          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
+            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
           </div>
         </div>
       )}
