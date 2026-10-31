@@ -80,14 +80,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="min-h-full pb-20 bg-slate-50 flex flex-col select-none">
       {/* Top Blue Canvas Header */}
-      <div className="bg-[#1078CA] text-white pt-2 pb-6 px-4 rounded-b-[2rem] shadow-sm relative overflow-hidden">
-        <StatusBar darkTheme={true} />
+      <div className="bg-[#1078CA] text-white pt-2 pb-6 px-4 rounded-b-[2rem] shadow-sm relative flex-shrink-0">
+        {/* Decorative layer is clipped on its own so it can never crop the content cards */}
+        <div className="absolute inset-0 rounded-b-[2rem] overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
+        </div>
 
-        {/* Decorative subtle wave */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative">
+          <StatusBar darkTheme={true} />
+        </div>
 
         {/* Top Header Row */}
-        <div className="flex items-center justify-between mt-2 mb-3">
+        <div className="relative flex items-center justify-between mt-2 mb-3">
           {/* Logo and Greeting */}
           <div className="flex items-center space-x-2.5">
             <BrimoLogo size="md" variant="white" />
@@ -122,7 +126,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
 
         {/* Card Keterangan: Saldo Rekening Utama (Harus tampil penuh & tidak tertutupi) */}
-        <div className="mt-3 bg-gradient-to-r from-[#0c5999] via-[#0b63ac] to-[#1078CA] rounded-2xl p-4 border border-white/20 shadow-lg relative overflow-hidden">
+        <div className="relative mt-3 flex-shrink-0 bg-gradient-to-r from-[#0c5999] via-[#0b63ac] to-[#1078CA] rounded-2xl p-4 border border-white/20 shadow-lg overflow-hidden">
           {/* Wavy background accent */}
           <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none" />
 
