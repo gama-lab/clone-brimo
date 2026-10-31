@@ -1,21 +1,28 @@
-// Service Worker for BRImo PWA
-const CACHE_NAME = 'brimo-pwa-v1';
+// Service Worker for BRImo PWA - Network First with automatic cache busting
+const CACHE_NAME = 'brimo-pwa-v3';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
-  // Simple pass-through fetch handler satisfying Chrome PWA installability requirements
+  // Always fetch fresh from network first so code updates are immediate
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    }).catch(() => {
-      return caches.match('/');
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
+

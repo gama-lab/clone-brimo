@@ -645,21 +645,21 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         </div>
       )}
 
-      {/* 6. ERROR / PEMELIHARAAN SISTEM BRIMO (User Rule: kalau barcode, tampilkan error biasanya / maintenance brimo) */}
+      {/* 6. ERROR TRANSAKSI QRIS OTENTIK ALA BRIMO ([QR-91] Transaksi Belum Dapat Diproses) */}
       {maintenanceError && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in">
           <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3 animate-sheet-up">
-            <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-2">
-              <AlertTriangle size={32} />
+            <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-2">
+              <AlertCircle size={32} />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
-                Kode: BND-01
+              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full font-mono border border-rose-200">
+                [QR-91] Transaksi Belum Dapat Diproses
               </span>
-              <h3 className="text-sm font-bold text-slate-900 mt-1">Sistem Sedang Dalam Pemeliharaan</h3>
+              <h3 className="text-sm font-bold text-slate-900 mt-1.5">Transaksi Belum Dapat Diproses</h3>
             </div>
             <p className="text-xs text-slate-500 leading-relaxed">
-              Mohon maaf, saat ini fitur transaksi QRIS sedang dalam peningkatan kualitas sistem berkala. Silakan coba kembali beberapa saat lagi.
+              Mohon maaf, pembayaran QRIS belum dapat diselesaikan ke sistem merchant. Silakan pastikan koneksi internet stabil atau coba beberapa saat lagi.
             </p>
             <div className="pt-2 space-y-2">
               <button

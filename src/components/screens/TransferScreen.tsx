@@ -1047,21 +1047,21 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* ERROR / PEMELIHARAAN SISTEM BRIMO */}
+      {/* ERROR TRANSAKSI GAGAL OTENTIK ALA BRIMO ([99] Transaksi Belum Dapat Diproses) */}
       {showMaintenanceModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
           <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3.5 animate-sheet-up">
-            <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-1">
-              <AlertTriangle size={32} />
+            <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-1">
+              <AlertCircle size={32} />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                Kode: BND-01
+              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full font-mono">
+                [99] Transaksi Tidak Dapat Diproses
               </span>
-              <h3 className="text-sm font-bold text-slate-900 mt-2">Sistem Sedang Dalam Pemeliharaan</h3>
+              <h3 className="text-sm font-bold text-slate-900 mt-2">Transaksi Belum Dapat Diproses</h3>
             </div>
             <p className="text-xs text-slate-500 leading-relaxed">
-              Mohon maaf, saat ini transaksi transfer tidak dapat diproses karena sedang ada peningkatan kualitas sistem perbankan berkala. Silakan coba kembali beberapa saat lagi.
+              Mohon maaf, transaksi Anda belum dapat diproses saat ini. Silakan pastikan jaringan internet Anda stabil dan coba beberapa saat lagi.
             </p>
             <div className="pt-2">
               <button

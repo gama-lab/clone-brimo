@@ -80,7 +80,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="min-h-full pb-20 bg-slate-50 flex flex-col select-none">
       {/* Top Blue Canvas Header */}
-      <div className="bg-[#1078CA] text-white pt-2 pb-5 px-4 rounded-b-[2rem] shadow-sm relative overflow-hidden">
+      <div className="bg-[#1078CA] text-white pt-2 pb-6 px-4 rounded-b-[2rem] shadow-sm relative overflow-hidden">
         <StatusBar darkTheme={true} />
 
         {/* Decorative subtle wave */}
