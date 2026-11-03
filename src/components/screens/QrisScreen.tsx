@@ -613,13 +613,11 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         </div>
       )}
 
-      {/* 4. Processing QR Code from Gallery (Continuous Loading) */}
+      {/* 4. Processing QR Code from Gallery (Pure loading state without text) */}
       {isProcessingQR && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in">
-          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3">
-            <div className="w-12 h-12 border-4 border-[#1078CA]/20 border-t-[#1078CA] rounded-full animate-spin mx-auto" />
-            <h3 className="text-sm font-bold text-slate-900">Memproses QRIS...</h3>
-            <p className="text-xs text-slate-500">Sedang memverifikasi kode barcode gambar</p>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
+          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
+            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
           </div>
         </div>
       )}

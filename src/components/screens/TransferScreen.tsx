@@ -56,7 +56,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
   // Clean input and auto-detect recipient
   const cleanInputDigits = targetAccountNumber.replace(/\D/g, '');
   const detectedRecipient = KNOWN_ACCOUNTS[cleanInputDigits] || (
-    cleanInputDigits.includes('08993782032') ? KNOWN_ACCOUNTS['08993782032'] : null
+    cleanInputDigits.includes('08993782032') ? KNOWN_ACCOUNTS['08993782032'] : (
+      cleanInputDigits.includes('491001007200537') ? KNOWN_ACCOUNTS['491001007200537'] : null
+    )
   );
 
   // Filtered beneficiaries for search
@@ -99,7 +101,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
       return;
     }
     const clean = targetAccountNumber.replace(/\D/g, '');
-    const matched = detectedRecipient || KNOWN_ACCOUNTS[clean] || (targetBank.id === 'allo' ? KNOWN_ACCOUNTS['08993782032'] : null);
+    const matched = detectedRecipient || KNOWN_ACCOUNTS[clean] || (
+      clean.includes('491001007200537') ? KNOWN_ACCOUNTS['491001007200537'] : (
+        targetBank.id === 'allo' ? KNOWN_ACCOUNTS['08993782032'] : null
+      )
+    );
 
     const resolvedName = matched ? matched.name : (targetBank.id === 'allo' ? 'RICA WIDA JAYANTI' : 'MANSYUR');
     const resolvedBankName = matched ? matched.bankName : targetBank.name;
@@ -528,6 +534,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                       if (digits === '08993782032' || digits.includes('08993782032')) {
                         const allo = SUPPORTED_BANKS.find(b => b.id === 'allo');
                         if (allo) setTargetBank(allo);
+                      } else if (digits === '491001007200537' || digits.includes('491001007200537')) {
+                        const bri = SUPPORTED_BANKS.find(b => b.id === 'bri');
+                        if (bri) setTargetBank(bri);
                       } else if (KNOWN_ACCOUNTS[digits]) {
                         const target = KNOWN_ACCOUNTS[digits];
                         const matched = SUPPORTED_BANKS.find(b => b.code === target.bankCode || b.name === target.bankName);
@@ -1034,15 +1043,11 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* PROCESSING TRANSACTION LOADING (Ala BRImo) */}
+      {/* PROCESSING TRANSACTION LOADING (Pure loading state without server text) */}
       {isProcessingTx && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
-          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3.5">
-            <div className="w-12 h-12 border-4 border-[#1078CA]/20 border-t-[#1078CA] rounded-full animate-spin mx-auto" />
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Memproses Transaksi...</h3>
-              <p className="text-xs text-slate-500 mt-1">Sedang menghubungkan ke server perbankan BRI</p>
-            </div>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
+          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
+            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
           </div>
         </div>
       )}

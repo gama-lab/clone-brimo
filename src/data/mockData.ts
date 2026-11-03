@@ -6,7 +6,7 @@ export const INITIAL_USER: UserProfile = {
   accountNumber: '3819 0104 6674 532',
   maskedAccountNumber: '3819 0104 **** 532',
   accountType: 'Tabungan BRI BritAma',
-  balance: 1550000, // Rp 1.550.000
+  balance: 20500000, // Rp 20.500.000 (20jt 500)
 };
 
 export const RECENT_TRANSFERS: Beneficiary[] = [
@@ -239,6 +239,15 @@ export const INITIAL_BENEFICIARIES: Beneficiary[] = [
     avatarBg: 'bg-slate-100 text-[#1078CA]',
   },
   {
+    id: 'ben-nurmiati',
+    name: 'Nurmiati',
+    accountNumber: '491001007200537',
+    bankName: 'BANK BRI',
+    bankCode: '002',
+    initials: 'N',
+    avatarBg: 'bg-slate-100 text-[#1078CA]',
+  },
+  {
     id: 'ben-24',
     name: 'NUR SALSABILLAH FITR',
     accountNumber: '208501022755504',
@@ -421,7 +430,7 @@ export const NEW_INCOMING_TX: Transaction = {
   category: 'in',
   referenceNo: '5125798',
   status: 'Sukses',
-  balanceAfter: 1550000,
+  balanceAfter: 20500000,
   senderReceiver: 'BFST381901046674532ASEHPRYANTO :BNINIDJA',
 };
 
