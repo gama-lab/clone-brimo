@@ -93,6 +93,73 @@ const parseQrisPayload = (rawData: string): ParsedQris => {
   };
 };
 
+/**
+ * Multi-engine high-accuracy QR code detector:
+ * 1. Native BarcodeDetector API (Built-in hardware accelerated on modern Chrome/Android)
+ * 2. Multi-scale jsQR (Tests 800px, 600px, 1000px, 400px with both color inversions)
+ * 3. Center crop jsQR (Specialized for smartphone screenshots with QR code in center)
+ */
+const detectQrFromImage = async (img: HTMLImageElement): Promise<string | null> => {
+  // 1. Try native BarcodeDetector API
+  if ('BarcodeDetector' in window) {
+    try {
+      const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+      const barcodes = await detector.detect(img);
+      if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+        return barcodes[0].rawValue;
+      }
+    } catch (e) {
+      console.warn('Native BarcodeDetector fallback to jsQR:', e);
+    }
+  }
+
+  // 2. Multi-scale jsQR
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return null;
+
+  const targetScales = [800, 600, 1000, 400, Math.max(img.width, img.height)];
+  for (const maxDim of targetScales) {
+    let w = img.width;
+    let h = img.height;
+    if (w > maxDim || h > maxDim) {
+      if (w > h) {
+        h = Math.round((h * maxDim) / w);
+        w = maxDim;
+      } else {
+        w = Math.round((w * maxDim) / h);
+        h = maxDim;
+      }
+    }
+
+    canvas.width = w;
+    canvas.height = h;
+    ctx.drawImage(img, 0, 0, w, h);
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const code = jsQR(imgData.data, w, h, { inversionAttempts: 'attemptBoth' });
+    if (code && code.data) {
+      return code.data;
+    }
+  }
+
+  // 3. Center-crop for screenshots (middle 70% where QR code is displayed)
+  const cropW = Math.round(img.width * 0.7);
+  const cropH = Math.round(img.height * 0.7);
+  const startX = Math.round((img.width - cropW) / 2);
+  const startY = Math.round((img.height - cropH) / 2);
+
+  canvas.width = Math.min(800, cropW);
+  canvas.height = Math.min(800, cropH);
+  ctx.drawImage(img, startX, startY, cropW, cropH, 0, 0, canvas.width, canvas.height);
+  const cropData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const cropCode = jsQR(cropData.data, canvas.width, canvas.height, { inversionAttempts: 'attemptBoth' });
+  if (cropCode && cropCode.data) {
+    return cropCode.data;
+  }
+
+  return null;
+};
+
 export const QrisScreen: React.FC<QrisScreenProps> = ({
   user,
   onBack,
@@ -290,51 +357,42 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
-      img.onload = () => {
-        // Create canvas to scan image with jsQR
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        if (!ctx) {
+      img.onload = async () => {
+        try {
+          // Multi-engine high-accuracy QR code detection
+          const qrData = await detectQrFromImage(img);
+
+          if (!qrData) {
+            // NOT A BARCODE / QR CODE -> Gagal
+            setTimeout(() => {
+              setIsProcessingQR(false);
+              setNotQrError(true);
+            }, 600);
+          } else {
+            // IS A BARCODE / QR CODE -> Read QRIS and enter input_nominal!
+            try {
+              if (navigator.vibrate) navigator.vibrate(40);
+            } catch {}
+            const parsed = parseQrisPayload(qrData);
+            setMerchant({
+              name: parsed.name,
+              service: parsed.service,
+              id: parsed.id,
+            });
+            if (parsed.amount) {
+              const num = parseInt(parsed.amount, 10);
+              if (!isNaN(num) && num > 0) {
+                setNominalStr(num.toLocaleString('id-ID'));
+              }
+            }
+            setTimeout(() => {
+              setIsProcessingQR(false);
+              setStep('input_nominal');
+            }, 800);
+          }
+        } catch (err) {
           setIsProcessingQR(false);
           setNotQrError(true);
-          return;
-        }
-
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-        // User requirement:
-        // "kalau bukan barcode langsung gagal. dan kalau barcode bisa masuk dan membaca qris"
-        if (!code) {
-          // NOT A BARCODE / QR CODE -> Gagal
-          setTimeout(() => {
-            setIsProcessingQR(false);
-            setNotQrError(true);
-          }, 600);
-        } else {
-          // IS A BARCODE / QR CODE -> Read QRIS and enter input_nominal!
-          try {
-            if (navigator.vibrate) navigator.vibrate(40);
-          } catch {}
-          const parsed = parseQrisPayload(code.data);
-          setMerchant({
-            name: parsed.name,
-            service: parsed.service,
-            id: parsed.id,
-          });
-          if (parsed.amount) {
-            const num = parseInt(parsed.amount, 10);
-            if (!isNaN(num) && num > 0) {
-              setNominalStr(num.toLocaleString('id-ID'));
-            }
-          }
-          setTimeout(() => {
-            setIsProcessingQR(false);
-            setStep('input_nominal');
-          }, 800);
         }
       };
       img.onerror = () => {
@@ -375,13 +433,13 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
   return (
     <div className="h-full min-h-full w-full bg-slate-900 text-white flex flex-col justify-between select-none">
-      {/* Hidden File Input for Gallery */}
+      {/* Hidden File Input for Gallery Picker */}
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/*"
-        className="hidden"
+        className="opacity-0 absolute w-0 h-0 pointer-events-none -z-50"
       />
 
       {/* 1. SCANNER CAMERA VIEW (Exact match to WhatsApp Image 2026-10-31 at 16.01.28.jpeg) */}
@@ -480,7 +538,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               <button
                 type="button"
                 onClick={handleGalleryClick}
-                className="w-12 h-12 rounded-full bg-white text-slate-800 flex items-center justify-center shadow-xl active:scale-90 transition-all hover:bg-slate-100"
+                className="w-12 h-12 rounded-full bg-white/95 text-[#1078CA] flex items-center justify-center shadow-xl border border-white/40 active:scale-90 transition-all hover:bg-white"
                 title="Unggah Gambar Barcode dari Galeri"
               >
                 <ImageIcon size={22} className="text-[#1078CA]" />
@@ -722,12 +780,23 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             <p className="text-xs text-slate-500 leading-relaxed">
               Gambar yang Anda pilih tidak mengandung kode QR/Barcode yang valid. Pastikan Anda mengunggah gambar QRIS.
             </p>
-            <button
-              onClick={() => setNotQrError(false)}
-              className="w-full mt-2 py-3 bg-[#1078CA] text-white font-bold text-xs rounded-xl shadow-md active:scale-95 transition-all"
-            >
-              Coba Gambar Lain
-            </button>
+            <div className="pt-2 space-y-2">
+              <button
+                onClick={() => {
+                  setNotQrError(false);
+                  setTimeout(() => handleGalleryClick(), 150);
+                }}
+                className="w-full py-3 bg-[#1078CA] hover:bg-[#0d64a8] text-white font-bold text-xs rounded-xl shadow-md active:scale-95 transition-all"
+              >
+                Pilih Gambar Lain
+              </button>
+              <button
+                onClick={() => setNotQrError(false)}
+                className="w-full py-2.5 text-slate-500 hover:text-slate-700 font-bold text-xs rounded-xl active:scale-95 transition-all"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
