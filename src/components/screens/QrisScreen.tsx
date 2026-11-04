@@ -10,8 +10,7 @@ import {
   AlertCircle,
   AlertTriangle,
   X,
-  Camera,
-  Lock
+  Camera
 } from 'lucide-react';
 import jsQR from 'jsqr';
 import { UserProfile, Transaction } from '../../types';
@@ -682,14 +681,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
                   <Store size={22} />
                 </div>
                 <div>
-                  <div className="flex items-center space-x-2">
-                    <h3 className="text-sm font-bold text-slate-900 leading-tight">{merchant.name}</h3>
-                    {isDynamicQr && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-[#1078CA] border border-blue-200 rounded-md tracking-wider">
-                        DINAMIS
-                      </span>
-                    )}
-                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 leading-tight">{merchant.name}</h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
                     {merchant.service}{merchant.city ? ` • ${merchant.city}` : ''}
                   </p>
@@ -726,16 +718,9 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
                         placeholder="0"
                       />
                     </div>
-                    {isDynamicQr ? (
-                      <div className="flex items-center space-x-1.5 mt-1.5 text-[11px] text-[#1078CA] font-medium">
-                        <Lock size={12} className="flex-shrink-0" />
-                        <span>Nominal otomatis dari QRIS Dinamis</span>
-                      </div>
-                    ) : (
-                      <span className="text-[11px] text-slate-400 block mt-1">
-                        Isi sesuai dengan nominal yang perlu dibayar.
-                      </span>
-                    )}
+                    <span className="text-[11px] text-slate-400 block mt-1">
+                      Isi sesuai dengan nominal yang perlu dibayar.
+                    </span>
                   </div>
 
                   {/* Quick amount chips for static QR */}
