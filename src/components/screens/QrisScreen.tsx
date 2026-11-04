@@ -26,6 +26,73 @@ interface QrisScreenProps {
 
 type QrisStep = 'scan' | 'input_nominal' | 'receipt';
 
+interface ParsedQris {
+  name: string;
+  service: string;
+  id: string;
+  amount?: string;
+}
+
+/**
+ * Parser for QRIS EMVCo QR Code standard (Indonesia MPM)
+ * Extracts Merchant Name (tag 59), Merchant ID/PAN (tag 26/51), and Amount (tag 54)
+ */
+const parseQrisPayload = (rawData: string): ParsedQris => {
+  let name = '';
+  let id = '';
+  let amount = '';
+  const service = 'QRIS Bayar';
+
+  if (!rawData) {
+    return { name: 'Kios Ummy 77', service: 'QRIS Bayar', id: '26020400000239' };
+  }
+
+  // Check EMVCo QRIS format (000201...)
+  const emvIdx = rawData.indexOf('000201');
+  if (emvIdx !== -1) {
+    const payload = rawData.slice(emvIdx);
+    let i = 0;
+    while (i < payload.length - 4) {
+      const tag = payload.slice(i, i + 2);
+      const len = parseInt(payload.slice(i + 2, i + 4), 10);
+      if (isNaN(len) || i + 4 + len > payload.length) break;
+      const val = payload.slice(i + 4, i + 4 + len);
+
+      if (tag === '59') {
+        name = val.trim();
+      } else if (tag === '54') {
+        amount = val.trim();
+      } else if (tag === '26' || tag === '51') {
+        const match = val.match(/\d{9,16}/);
+        if (match) id = match[0];
+      }
+      i += 4 + len;
+    }
+  }
+
+  if (!name) {
+    if (rawData.startsWith('http://') || rawData.startsWith('https://')) {
+      try {
+        const u = new URL(rawData);
+        name = u.hostname.replace('www.', '').toUpperCase();
+      } catch {
+        name = 'Kios Ummy 77';
+      }
+    } else if (rawData.length > 0 && rawData.length < 40 && !/^\d+$/.test(rawData)) {
+      name = rawData.trim();
+    } else {
+      name = 'Kios Ummy 77';
+    }
+  }
+
+  return {
+    name: name || 'Kios Ummy 77',
+    service: service,
+    id: id || '26020400000239',
+    amount: amount || undefined,
+  };
+};
+
 export const QrisScreen: React.FC<QrisScreenProps> = ({
   user,
   onBack,
@@ -39,8 +106,9 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
     return localStorage.getItem('brimo_camera_permission') !== 'granted';
   });
 
-  // Gallery detection states
+  // Gallery and transaction detection states
   const [isProcessingQR, setIsProcessingQR] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [notQrError, setNotQrError] = useState(false);
   const [maintenanceError, setMaintenanceError] = useState(false);
 
@@ -53,12 +121,12 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Merchant info from reference (WhatsApp Image 2026-10-31 at 16.01.27.jpeg)
-  const merchant = {
+  // Dynamic merchant info parsed from QRIS or default reference
+  const [merchant, setMerchant] = useState({
     name: 'Jafar',
     service: 'Scan DANA',
     id: '033040132',
-  };
+  });
 
   const numAmount = parseInt(nominalStr.replace(/\D/g, '') || '0', 10);
 
@@ -119,7 +187,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
   // Real-time live camera feed QR/Barcode detection with jsQR
   useEffect(() => {
-    if (!cameraActive || isProcessingQR || maintenanceError) return;
+    if (!cameraActive || isProcessingQR || isProcessingPayment || maintenanceError || step !== 'scan') return;
 
     let animId: number;
     let isActive = true;
@@ -133,7 +201,9 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         videoRef.current &&
         videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA &&
         !isProcessingQR &&
-        !maintenanceError
+        !isProcessingPayment &&
+        !maintenanceError &&
+        step === 'scan'
       ) {
         const video = videoRef.current;
         if (video.videoWidth > 0 && video.videoHeight > 0 && ctx) {
@@ -146,12 +216,27 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
           });
 
           if (code && code.data) {
-            // Authentic QR Code detected live from camera!
+            // Authentic QR Code detected live from camera -> read QRIS and enter input_nominal!
+            try {
+              if (navigator.vibrate) navigator.vibrate(40);
+            } catch {}
             setIsProcessingQR(true);
+            const parsed = parseQrisPayload(code.data);
+            setMerchant({
+              name: parsed.name,
+              service: parsed.service,
+              id: parsed.id,
+            });
+            if (parsed.amount) {
+              const num = parseInt(parsed.amount, 10);
+              if (!isNaN(num) && num > 0) {
+                setNominalStr(num.toLocaleString('id-ID'));
+              }
+            }
             setTimeout(() => {
               setIsProcessingQR(false);
-              setMaintenanceError(true);
-            }, 2400);
+              setStep('input_nominal');
+            }, 800);
             return;
           }
         }
@@ -166,7 +251,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
       isActive = false;
       cancelAnimationFrame(animId);
     };
-  }, [cameraActive, isProcessingQR, maintenanceError]);
+  }, [cameraActive, isProcessingQR, isProcessingPayment, maintenanceError, step]);
 
   // Handle Flashlight toggle
   const toggleFlashlight = async () => {
@@ -222,7 +307,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
         // User requirement:
-        // "kalau bukan barcode langsung gagal. dan kalau barcode cukup loading terus, terus tampilkan error biasanya atau maintanance brimo gitu"
+        // "kalau bukan barcode langsung gagal. dan kalau barcode bisa masuk dan membaca qris"
         if (!code) {
           // NOT A BARCODE / QR CODE -> Gagal
           setTimeout(() => {
@@ -230,11 +315,26 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             setNotQrError(true);
           }, 600);
         } else {
-          // IS A BARCODE / QR CODE -> Loading terus, lalu tampilkan error/maintenance BRImo!
+          // IS A BARCODE / QR CODE -> Read QRIS and enter input_nominal!
+          try {
+            if (navigator.vibrate) navigator.vibrate(40);
+          } catch {}
+          const parsed = parseQrisPayload(code.data);
+          setMerchant({
+            name: parsed.name,
+            service: parsed.service,
+            id: parsed.id,
+          });
+          if (parsed.amount) {
+            const num = parseInt(parsed.amount, 10);
+            if (!isNaN(num) && num > 0) {
+              setNominalStr(num.toLocaleString('id-ID'));
+            }
+          }
           setTimeout(() => {
             setIsProcessingQR(false);
-            setMaintenanceError(true);
-          }, 2400);
+            setStep('input_nominal');
+          }, 800);
         }
       };
       img.onerror = () => {
@@ -246,7 +346,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
     reader.readAsDataURL(file);
   };
 
-  // Handle nominal transfer process
+  // Handle nominal transfer process (User requirement: saat mau transaksi itu loading dan error)
   const handleProcessPayment = () => {
     if (numAmount <= 0) {
       alert('Masukkan nominal pembayaran');
@@ -257,31 +357,20 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
       return;
     }
 
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    const ref = generateRefNo('241');
+    // Pure loading state ala BRImo, followed by authentic error
+    setIsProcessingPayment(true);
+    setTimeout(() => {
+      setIsProcessingPayment(false);
+      setMaintenanceError(true);
+    }, 2000);
+  };
 
-    const newTx: Transaction = {
-      id: `TRX-${ref}`,
-      title: 'Pembelian QRIS',
-      description: `${merchant.name} - ${merchant.id}`,
-      amount: numAmount,
-      type: 'qris',
-      date: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
-      time: `${hours}:${mins}`,
-      recipientName: merchant.name,
-      recipientAccount: merchant.id,
-      category: 'out',
-      referenceNo: ref,
-      status: 'Sukses',
-      adminFee: 0,
-      balanceAfter: user.balance - numAmount,
-    };
-
-    setCompletedTx(newTx);
-    onPaymentSuccess(newTx, user.balance - numAmount);
-    setStep('receipt');
+  const handleQuickScan = () => {
+    setIsProcessingQR(true);
+    setTimeout(() => {
+      setIsProcessingQR(false);
+      setStep('input_nominal');
+    }, 600);
   };
 
   return (
@@ -339,7 +428,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
           <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 my-auto">
             {/* Camera Viewfinder Box with exact 270x270 size */}
             <div
-              onClick={() => cameraActive && setStep('input_nominal')}
+              onClick={handleQuickScan}
               className="w-[270px] h-[270px] relative active:scale-[0.99] transition-transform flex items-center justify-center rounded-sm"
               title="Arahkan kamera ke QRIS atau ketuk untuk bayar"
             >
@@ -420,7 +509,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               {/* Card 1: Alfamart / QR Bayar */}
               <button 
                 type="button"
-                onClick={() => setStep('input_nominal')}
+                onClick={handleQuickScan}
                 className="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs hover:border-[#1078CA] active:scale-95 transition-all"
               >
                 <div className="h-6 flex items-center justify-center mb-1">
@@ -434,7 +523,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               {/* Card 2: QR Transfer */}
               <button 
                 type="button"
-                onClick={() => setStep('input_nominal')}
+                onClick={handleQuickScan}
                 className="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs hover:border-[#1078CA] active:scale-95 transition-all"
               >
                 <div className="h-6 flex items-center justify-center mb-1">
@@ -613,8 +702,8 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         </div>
       )}
 
-      {/* 4. Processing QR Code from Gallery (Pure loading state without text) */}
-      {isProcessingQR && (
+      {/* 4. Processing QR Code / Transaction (Pure loading state without text) */}
+      {(isProcessingQR || isProcessingPayment) && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
           <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
             <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />

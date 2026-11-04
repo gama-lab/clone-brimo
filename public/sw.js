@@ -1,5 +1,5 @@
 // Service Worker for BRImo PWA - Network First with automatic cache busting
-const CACHE_NAME = 'brimo-pwa-v3';
+const CACHE_NAME = 'brimo-pwa-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
