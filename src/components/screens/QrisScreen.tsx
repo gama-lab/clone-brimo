@@ -10,7 +10,8 @@ import {
   AlertCircle,
   AlertTriangle,
   X,
-  Camera
+  Camera,
+  Lock
 } from 'lucide-react';
 import jsQR from 'jsqr';
 import { UserProfile, Transaction } from '../../types';
@@ -30,17 +31,24 @@ interface ParsedQris {
   name: string;
   service: string;
   id: string;
+  city?: string;
   amount?: string;
+  isDynamic?: boolean;
+  invoiceNo?: string;
 }
 
 /**
  * Parser for QRIS EMVCo QR Code standard (Indonesia MPM)
- * Extracts Merchant Name (tag 59), Merchant ID/PAN (tag 26/51), and Amount (tag 54)
+ * Extracts Merchant Name (tag 59), City (tag 60), Merchant ID/PAN (tag 26/51),
+ * Point of Initiation Method (tag 01), Amount (tag 54), and Invoice/Reference (tag 62).
  */
 const parseQrisPayload = (rawData: string): ParsedQris => {
   let name = '';
   let id = '';
   let amount = '';
+  let city = '';
+  let isDynamic = false;
+  let invoiceNo = '';
   const service = 'QRIS Bayar';
 
   if (!rawData) {
@@ -58,13 +66,33 @@ const parseQrisPayload = (rawData: string): ParsedQris => {
       if (isNaN(len) || i + 4 + len > payload.length) break;
       const val = payload.slice(i + 4, i + 4 + len);
 
-      if (tag === '59') {
+      if (tag === '01') {
+        // Tag 01: Point of Initiation Method ('11' = Static, '12' = Dynamic)
+        if (val === '12') isDynamic = true;
+      } else if (tag === '59') {
         name = val.trim();
+      } else if (tag === '60') {
+        city = val.trim();
       } else if (tag === '54') {
+        // Tag 54: Transaction Amount
         amount = val.trim();
+        isDynamic = true;
       } else if (tag === '26' || tag === '51') {
         const match = val.match(/\d{9,16}/);
         if (match) id = match[0];
+      } else if (tag === '62') {
+        // Additional Data Field Template (Subtag 01: Bill Number / Invoice)
+        let j = 0;
+        while (j < val.length - 4) {
+          const subTag = val.slice(j, j + 2);
+          const subLen = parseInt(val.slice(j + 2, j + 4), 10);
+          if (isNaN(subLen) || j + 4 + subLen > val.length) break;
+          const subVal = val.slice(j + 4, j + 4 + subLen);
+          if (subTag === '01') {
+            invoiceNo = subVal.trim();
+          }
+          j += 4 + subLen;
+        }
       }
       i += 4 + len;
     }
@@ -74,7 +102,17 @@ const parseQrisPayload = (rawData: string): ParsedQris => {
     if (rawData.startsWith('http://') || rawData.startsWith('https://')) {
       try {
         const u = new URL(rawData);
-        name = u.hostname.replace('www.', '').toUpperCase();
+        const urlAmount = u.searchParams.get('amount') || u.searchParams.get('nominal') || u.searchParams.get('total');
+        if (urlAmount) {
+          amount = urlAmount;
+          isDynamic = true;
+        }
+        const urlMerchant = u.searchParams.get('merchant') || u.searchParams.get('name');
+        if (urlMerchant) {
+          name = decodeURIComponent(urlMerchant);
+        } else {
+          name = u.hostname.replace('www.', '').toUpperCase();
+        }
       } catch {
         name = 'Kios Ummy 77';
       }
@@ -89,7 +127,10 @@ const parseQrisPayload = (rawData: string): ParsedQris => {
     name: name || 'Kios Ummy 77',
     service: service,
     id: id || '26020400000239',
+    city: city || undefined,
     amount: amount || undefined,
+    isDynamic: isDynamic || Boolean(amount),
+    invoiceNo: invoiceNo || undefined,
   };
 };
 
@@ -180,7 +221,8 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
   const [maintenanceError, setMaintenanceError] = useState(false);
 
   // Payment states
-  const [nominalStr, setNominalStr] = useState<string>('15.000');
+  const [nominalStr, setNominalStr] = useState<string>('');
+  const [isDynamicQr, setIsDynamicQr] = useState<boolean>(false);
   const [note, setNote] = useState<string>('');
   const [completedTx, setCompletedTx] = useState<Transaction | null>(null);
 
@@ -190,10 +232,43 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
   // Dynamic merchant info parsed from QRIS or default reference
   const [merchant, setMerchant] = useState({
-    name: 'Jafar',
-    service: 'Scan DANA',
-    id: '033040132',
+    name: 'Kios Ummy 77',
+    service: 'QRIS Bayar',
+    id: '26020400000239',
+    city: '',
   });
+
+  // Reusable dispatcher to set merchant, nominal and dynamic status
+  const applyParsedQris = (parsed: ParsedQris) => {
+    setMerchant({
+      name: parsed.name,
+      service: parsed.service,
+      id: parsed.id,
+      city: parsed.city || '',
+    });
+
+    if (parsed.amount) {
+      // Dynamic QRIS: Amount is predetermined by merchant
+      const num = Math.round(parseFloat(parsed.amount));
+      if (!isNaN(num) && num > 0) {
+        setNominalStr(num.toLocaleString('id-ID'));
+        setIsDynamicQr(true);
+      } else {
+        setNominalStr('');
+        setIsDynamicQr(false);
+      }
+    } else {
+      // Static QRIS: User enters nominal freely, begins empty
+      setNominalStr('');
+      setIsDynamicQr(false);
+    }
+
+    if (parsed.invoiceNo) {
+      setNote(`Ref: ${parsed.invoiceNo}`);
+    } else {
+      setNote('');
+    }
+  };
 
   const numAmount = parseInt(nominalStr.replace(/\D/g, '') || '0', 10);
 
@@ -289,17 +364,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             } catch {}
             setIsProcessingQR(true);
             const parsed = parseQrisPayload(code.data);
-            setMerchant({
-              name: parsed.name,
-              service: parsed.service,
-              id: parsed.id,
-            });
-            if (parsed.amount) {
-              const num = parseInt(parsed.amount, 10);
-              if (!isNaN(num) && num > 0) {
-                setNominalStr(num.toLocaleString('id-ID'));
-              }
-            }
+            applyParsedQris(parsed);
             setTimeout(() => {
               setIsProcessingQR(false);
               setStep('input_nominal');
@@ -374,17 +439,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               if (navigator.vibrate) navigator.vibrate(40);
             } catch {}
             const parsed = parseQrisPayload(qrData);
-            setMerchant({
-              name: parsed.name,
-              service: parsed.service,
-              id: parsed.id,
-            });
-            if (parsed.amount) {
-              const num = parseInt(parsed.amount, 10);
-              if (!isNaN(num) && num > 0) {
-                setNominalStr(num.toLocaleString('id-ID'));
-              }
-            }
+            applyParsedQris(parsed);
             setTimeout(() => {
               setIsProcessingQR(false);
               setStep('input_nominal');
@@ -425,6 +480,15 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
   const handleQuickScan = () => {
     setIsProcessingQR(true);
+    setMerchant({
+      name: 'Kios Ummy 77',
+      service: 'QRIS Bayar',
+      id: '26020400000239',
+      city: '',
+    });
+    setNominalStr('');
+    setIsDynamicQr(false);
+    setNote('');
     setTimeout(() => {
       setIsProcessingQR(false);
       setStep('input_nominal');
@@ -618,8 +682,17 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
                   <Store size={22} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 leading-tight">{merchant.name}</h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">{merchant.service}</p>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">{merchant.name}</h3>
+                    {isDynamicQr && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-[#1078CA] border border-blue-200 rounded-md tracking-wider">
+                        DINAMIS
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    {merchant.service}{merchant.city ? ` • ${merchant.city}` : ''}
+                  </p>
                   <p className="text-[11px] text-slate-400 font-mono">ID {merchant.id}</p>
                 </div>
               </div>
@@ -633,19 +706,53 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
                       <span className="text-slate-400 font-bold mr-1 text-2xl">Rp</span>
                       <input
                         type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={nominalStr}
+                        readOnly={isDynamicQr}
                         onChange={(e) => {
-                          const v = e.target.value.replace(/\D/g, '');
-                          setNominalStr(v ? parseInt(v, 10).toLocaleString('id-ID') : '0');
+                          if (isDynamicQr) return;
+                          const raw = e.target.value.replace(/\D/g, '');
+                          if (!raw) {
+                            setNominalStr('');
+                          } else {
+                            const val = parseInt(raw, 10);
+                            setNominalStr(val.toLocaleString('id-ID'));
+                          }
                         }}
-                        className="w-full font-black text-3xl text-slate-900 bg-transparent focus:outline-none"
+                        className={`w-full font-black text-3xl text-slate-900 bg-transparent focus:outline-none ${
+                          isDynamicQr ? 'cursor-default select-none' : ''
+                        }`}
                         placeholder="0"
                       />
                     </div>
-                    <span className="text-[11px] text-slate-400 block mt-1">
-                      Isi sesuai dengan nominal yang perlu dibayar.
-                    </span>
+                    {isDynamicQr ? (
+                      <div className="flex items-center space-x-1.5 mt-1.5 text-[11px] text-[#1078CA] font-medium">
+                        <Lock size={12} className="flex-shrink-0" />
+                        <span>Nominal otomatis dari QRIS Dinamis</span>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-slate-400 block mt-1">
+                        Isi sesuai dengan nominal yang perlu dibayar.
+                      </span>
+                    )}
                   </div>
+
+                  {/* Quick amount chips for static QR */}
+                  {!isDynamicQr && (
+                    <div className="flex items-center space-x-2 pt-1 overflow-x-auto no-scrollbar">
+                      {[10000, 20000, 50000, 100000].map((val) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setNominalStr(val.toLocaleString('id-ID'))}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold flex-shrink-0 active:scale-95 transition-all"
+                        >
+                          +{val.toLocaleString('id-ID')}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Catatan Field */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
