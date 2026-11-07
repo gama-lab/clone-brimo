@@ -81,19 +81,32 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
         {/* Subtle Horizontal Divider */}
         <div className="h-2.5 bg-slate-100/90 w-full border-t border-b border-slate-200/50" />
 
-        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-xl, authentic BRI logo) */}
+        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-[24px], authentic BRI logo & abstract waves) */}
         <div className="bg-white flex items-stretch border-b border-slate-100 relative pl-0 pr-4 py-3 sm:py-3.5 select-none">
-          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-xl, authentic circle waves) */}
-          <div className="w-[126px] h-[126px] sm:w-[134px] sm:h-[134px] rounded-r-xl rounded-l-none bg-[#0F78CB] shadow-sm relative overflow-hidden flex-shrink-0">
-            {/* Top-Left Darker Blue Circle */}
-            <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-[#0C66BE] pointer-events-none" />
+          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-[24px], authentic organic circle waves) */}
+          <div className="w-[126px] h-[126px] sm:w-[134px] sm:h-[134px] rounded-r-[24px] sm:rounded-r-[26px] rounded-l-none shadow-sm relative overflow-hidden flex-shrink-0">
+            {/* Authentic BRImo Debit Card Abstract Waves Background */}
+            <svg
+              viewBox="0 0 222 222"
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              preserveAspectRatio="none"
+            >
+              {/* Base Bank BRI Vibrant Blue */}
+              <rect width="222" height="222" fill="#0F78CB" />
 
-            {/* Bottom-Right Darker Blue Circle */}
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-[#085BB7] pointer-events-none" />
+              {/* Top-Left Organic Circle Wave */}
+              <circle cx="-6" cy="-9" r="95" fill="#0C69C1" />
+
+              {/* Bottom-Right Outer Organic Circle Wave */}
+              <circle cx="141" cy="190" r="83" fill="#0D69C0" />
+
+              {/* Bottom-Right Inner Organic Circle Wave */}
+              <circle cx="160" cy="210" r="50" fill="#095AB6" />
+            </svg>
 
             {/* Official Bank BRI Logo (Emblem + BRI Wordmark) positioned top-right */}
-            <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-10">
-              <BankBriLogo className="w-[34px] sm:w-[37px] h-auto" variant="white" />
+            <div className="absolute top-2.5 right-2 sm:top-3 sm:right-2.5 z-10">
+              <BankBriLogo className="w-[42px] sm:w-[46px] h-auto" variant="white" />
             </div>
           </div>
 
