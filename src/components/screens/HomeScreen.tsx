@@ -147,9 +147,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
 
           {/* Link: Semua Rekeningmu */}
-          <div className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between">
+          <div 
+            onClick={() => onNavigate('info-saldo')}
+            className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between cursor-pointer active:opacity-85 transition-opacity"
+          >
             <button
-              onClick={() => onNavigate('mutasi')}
+              type="button"
               className="text-xs font-semibold text-white/95 hover:text-white flex items-center space-x-1"
             >
               <span>Semua Rekeningmu</span>

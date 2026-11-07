@@ -8,6 +8,7 @@ import { TransferScreen } from './components/screens/TransferScreen';
 import { QrisScreen } from './components/screens/QrisScreen';
 import { AktivitasScreen } from './components/screens/AktivitasScreen';
 import { AccountScreen } from './components/screens/AccountScreen';
+import { InfoSaldoScreen } from './components/screens/InfoSaldoScreen';
 import { BottomNav } from './components/common/BottomNav';
 import { HomeSkeleton, MutasiSkeleton, AktivitasSkeleton } from './components/common/ScreenSkeletons';
 import { BrimoAlertModal, BrimoAlertData } from './components/common/BrimoAlertModal';
@@ -145,6 +146,14 @@ export const App: React.FC = () => {
             user={user}
             onNavigate={handleNavigate}
             onLogout={handleLogout}
+          />
+        )}
+
+        {currentScreen === 'info-saldo' && (
+          <InfoSaldoScreen
+            user={user}
+            onBack={() => handleNavigate('home')}
+            onNavigateMutasi={() => handleNavigate('mutasi')}
           />
         )}
       </div>

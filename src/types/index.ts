@@ -1,4 +1,4 @@
-export type Screen = 'login' | 'home' | 'mutasi' | 'transfer' | 'qris' | 'aktivitas' | 'account';
+export type Screen = 'login' | 'home' | 'mutasi' | 'transfer' | 'qris' | 'aktivitas' | 'account' | 'info-saldo';
 
 export interface UserProfile {
   name: string;
