@@ -95,8 +95,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         </div>
       </div>
 
-      {/* Bottom Fast Menu & Login Actions Card */}
-      <div className="bg-white text-slate-800 rounded-t-3xl pt-4 pb-6 px-4 shadow-[0_-10px_35px_rgba(0,0,0,0.15)] z-10">
+      {/* Bottom Fast Menu & Login Actions Card (Extended through safe area to ensure bottom navigation is pure white) */}
+      <div className="bg-white text-slate-800 rounded-t-3xl pt-4 pb-[max(1.75rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] px-4 shadow-[0_-10px_35px_rgba(0,0,0,0.15)] z-10">
         {/* Fast Menu Header */}
         <div className="flex items-center justify-center space-x-1 text-slate-500 mb-3">
           <span className="text-xs font-bold">Fast Menu</span>
@@ -170,7 +170,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       {/* Login Bottom Sheet Modal (from Photo on 31-10-26 at 15.26 #3.jpg) */}
       {showLoginSheet && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white rounded-t-3xl p-6 text-slate-800 shadow-2xl animate-sheet-up">
+          <div className="w-full max-w-md bg-white rounded-t-3xl p-6 pb-[max(2rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] text-slate-800 shadow-2xl animate-sheet-up">
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <button
