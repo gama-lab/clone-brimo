@@ -81,18 +81,19 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
         {/* Subtle Horizontal Divider */}
         <div className="h-2.5 bg-slate-100/90 w-full border-t border-b border-slate-200/50" />
 
-        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-[22px], authentic BRI logo) */}
+        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-xl, authentic BRI logo) */}
         <div className="bg-white flex items-stretch border-b border-slate-100 relative pl-0 pr-4 py-3 sm:py-3.5 select-none">
-          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-[22px], no chip/digits) */}
-          <div className="w-[130px] h-[130px] sm:w-[138px] sm:h-[138px] rounded-r-[22px] rounded-l-none bg-gradient-to-br from-[#07599e] via-[#0b75cb] to-[#07528e] shadow-sm relative overflow-hidden flex-shrink-0 border-y border-r border-white/20">
-            {/* Concentric circular gradient arcs matching real BritAma debit card */}
-            <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full border-[18px] border-white/10 pointer-events-none" />
-            <div className="absolute -left-4 -bottom-4 w-32 h-32 rounded-full border-[10px] border-white/8 pointer-events-none" />
-            <div className="absolute -right-6 -top-8 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
+          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-xl, authentic circle waves) */}
+          <div className="w-[126px] h-[126px] sm:w-[134px] sm:h-[134px] rounded-r-xl rounded-l-none bg-[#0F78CB] shadow-sm relative overflow-hidden flex-shrink-0">
+            {/* Top-Left Darker Blue Circle */}
+            <div className="absolute -left-10 -top-10 w-36 h-36 rounded-full bg-[#0C66BE] pointer-events-none" />
+
+            {/* Bottom-Right Darker Blue Circle */}
+            <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-[#085BB7] pointer-events-none" />
 
             {/* Official Bank BRI Logo (Emblem + BRI Wordmark) positioned top-right */}
             <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-10">
-              <BankBriLogo className="w-[38px] sm:w-[42px] h-auto drop-shadow-xs" variant="white" />
+              <BankBriLogo className="w-[34px] sm:w-[37px] h-auto" variant="white" />
             </div>
           </div>
 
