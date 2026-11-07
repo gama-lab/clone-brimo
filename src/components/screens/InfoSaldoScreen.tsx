@@ -78,65 +78,65 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
           </button>
         </div>
 
-        {/* Subtle Horizontal Divider */}
-        <div className="h-2.5 bg-slate-100/90 w-full border-t border-b border-slate-200/50" />
+        {/* Subtle Horizontal 1px Divider */}
+        <div className="border-b border-slate-100 w-full" />
 
-        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-[24px], authentic BRI logo & abstract waves) */}
-        <div className="bg-white flex items-stretch border-b border-slate-100 relative pl-0 pr-4 py-3 sm:py-3.5 select-none">
-          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-[24px], authentic organic circle waves) */}
-          <div className="w-[126px] h-[126px] sm:w-[134px] sm:h-[134px] rounded-r-[24px] sm:rounded-r-[26px] rounded-l-none shadow-sm relative overflow-hidden flex-shrink-0">
+        {/* Account Item Row (Exact match to authentic BRImo UI: flush to left edge, precise 1:1 aspect ratio, aligned text) */}
+        <div className="bg-white flex items-center relative pl-0 pr-4 sm:pr-5 pt-4 pb-4 select-none">
+          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-[10px], authentic organic circle waves) */}
+          <div className="w-[130px] h-[130px] sm:w-[136px] sm:h-[136px] rounded-r-[10px] rounded-l-none shadow-sm relative overflow-hidden flex-shrink-0">
             {/* Authentic BRImo Debit Card Abstract Waves Background */}
             <svg
-              viewBox="0 0 222 222"
+              viewBox="0 0 141 141"
               className="absolute inset-0 w-full h-full pointer-events-none"
               preserveAspectRatio="none"
             >
               {/* Base Bank BRI Vibrant Blue */}
-              <rect width="222" height="222" fill="#0F78CB" />
+              <rect width="141" height="141" fill="#0F78CB" />
 
               {/* Top-Left Organic Circle Wave */}
-              <circle cx="-6" cy="-9" r="95" fill="#0C69C1" />
+              <circle cx="-4" cy="-6" r="60" fill="#0C69C1" />
 
               {/* Bottom-Right Outer Organic Circle Wave */}
-              <circle cx="141" cy="190" r="83" fill="#0D69C0" />
+              <circle cx="90" cy="120" r="53" fill="#0D69C0" />
 
               {/* Bottom-Right Inner Organic Circle Wave */}
-              <circle cx="160" cy="210" r="50" fill="#095AB6" />
+              <circle cx="102" cy="133" r="32" fill="#095AB6" />
             </svg>
 
-            {/* Official Bank BRI Logo (Emblem + BRI Wordmark) positioned top-right */}
-            <div className="absolute top-2.5 right-2 sm:top-3 sm:right-2.5 z-10">
-              <BankBriLogo className="w-[42px] sm:w-[46px] h-auto" variant="white" />
+            {/* Official Bank BRI Logo (Emblem + BRI Wordmark) positioned top-right with authentic proportions */}
+            <div className="absolute top-3.5 right-4 z-10">
+              <BankBriLogo className="w-[32px] sm:w-[34px] h-auto" variant="white" />
             </div>
           </div>
 
-          {/* Right: Account Info & Balance */}
-          <div className="flex-1 pl-3.5 sm:pl-4 flex flex-col justify-between py-0.5">
+          {/* Right: Account Info & Balance (Height strictly matching card, top-aligned and bottom-aligned) */}
+          <div className="flex-1 h-[130px] sm:h-[136px] pl-4 sm:pl-5 flex flex-col justify-between py-0.5">
             <div>
               {/* Category Pill */}
-              <div className="mb-1">
-                <span className="border border-slate-200/90 bg-white text-slate-500 rounded-full px-2.5 py-0.5 text-[10px] font-medium inline-block shadow-2xs">
+              <div className="flex items-start">
+                <span className="border border-slate-300/80 bg-white text-slate-500 rounded-full px-3 py-0.5 text-[11px] font-medium inline-block leading-tight shadow-2xs">
                   Belum ada nama kategori
                 </span>
               </div>
 
               {/* Star + Account Number */}
-              <div className="flex items-center space-x-1.5 mt-0.5">
-                <Star size={13} className="fill-amber-400 text-amber-400 flex-shrink-0" />
-                <span className="text-xs sm:text-[13px] font-bold text-slate-900 tracking-tight">
+              <div className="flex items-center space-x-2 mt-2">
+                <Star size={14} className="fill-[#F5A623] text-[#F5A623] flex-shrink-0" />
+                <span className="text-[14px] font-bold text-slate-900 tracking-tight leading-none">
                   {user.accountNumber || '3819 0104 6674 532'}
                 </span>
               </div>
 
               {/* Account Holder Name */}
-              <p className="text-[11px] font-semibold text-slate-700 uppercase tracking-wide mt-0.5">
+              <p className="text-[12px] font-semibold text-slate-700 uppercase tracking-normal mt-1.5 pl-0.5">
                 {user.name || 'HERDIANGGA PRATAMA'}
               </p>
             </div>
 
-            {/* Balance & Detail Link */}
-            <div className="mt-auto pt-2 text-right">
-              <div className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-tight">
+            {/* Balance & Detail Link (Bottom-aligned with bottom of debit card) */}
+            <div className="text-right">
+              <div className="text-[15px] sm:text-base font-bold text-slate-900 tracking-tight leading-snug">
                 {formatRupiah(user.balance)}
               </div>
               <button
