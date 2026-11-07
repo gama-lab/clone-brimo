@@ -24,31 +24,33 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
       <div className="bg-[#1078CA] text-white pt-2 pb-3.5 px-4 flex-shrink-0 shadow-sm relative z-20">
         <StatusBar darkTheme={true} />
 
-        <div className="flex items-center justify-between mt-2">
+        <div className="relative flex items-center justify-between mt-2 min-h-[36px]">
           {/* Back Button */}
           <button
             type="button"
             onClick={onBack}
-            className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:scale-95 transition-all"
+            className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:scale-95 transition-all z-10"
             title="Kembali"
           >
-            <ArrowLeft size={22} />
+            <ArrowLeft size={20} className="stroke-[2.5]" />
           </button>
 
-          {/* Title */}
-          <h1 className="text-base font-bold text-white tracking-wide">
-            Info Saldo
-          </h1>
+          {/* Title: Mathematically Dead Center (0.0px offset from screen center) */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <h1 className="text-[15px] font-bold text-white tracking-wide">
+              Info Saldo
+            </h1>
+          </div>
 
-          {/* Currency Pill with Indonesian Flag */}
-          <div className="flex items-center space-x-1.5 bg-white/15 hover:bg-white/20 active:bg-white/25 border border-white/25 rounded-full px-2.5 py-1 text-white cursor-pointer transition-colors shadow-xs">
+          {/* Compact Currency Pill with Indonesian Flag */}
+          <div className="flex items-center space-x-1 bg-white/15 hover:bg-white/20 active:bg-white/25 rounded-full px-2 py-0.5 text-white cursor-pointer transition-colors z-10">
             {/* Indonesian Flag Round Badge */}
-            <div className="w-4 h-4 rounded-full overflow-hidden border border-white/40 flex flex-col flex-shrink-0 shadow-xs">
+            <div className="w-3.5 h-3.5 rounded-full overflow-hidden flex flex-col flex-shrink-0 shadow-2xs border border-white/30">
               <div className="w-full h-1/2 bg-[#ED1C24]" />
               <div className="w-full h-1/2 bg-white" />
             </div>
-            <span className="text-xs font-bold leading-none">Rp</span>
-            <ChevronDown size={14} className="text-white/90" />
+            <span className="text-[11px] font-semibold leading-none pl-0.5">Rp</span>
+            <ChevronDown size={11} className="text-white/80 -mr-0.5" />
           </div>
         </div>
       </div>
