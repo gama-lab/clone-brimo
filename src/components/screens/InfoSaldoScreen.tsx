@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronDown, ChevronRight, Star, X } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { formatRupiah } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
+import { BankBriLogo } from '../common/BankBriLogo';
 
 interface InfoSaldoScreenProps {
   user: UserProfile;
@@ -80,36 +81,27 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
         {/* Subtle Horizontal Divider */}
         <div className="h-2.5 bg-slate-100/90 w-full border-t border-b border-slate-200/50" />
 
-        {/* Account Item Row (Exact match to reference UI) */}
-        <div className="bg-white p-4 flex items-center justify-between border-b border-slate-100 relative">
-          {/* Left: Debit Card Mockup Flush to Left Edge */}
-          <div className="w-28 h-20 -ml-4 rounded-r-2xl bg-gradient-to-br from-[#0c66ac] via-[#1078CA] to-[#07508a] shadow-md relative overflow-hidden flex-shrink-0 p-2.5 flex flex-col justify-between border-y border-r border-white/20 select-none">
-            {/* Background concentric wave curves */}
-            <div className="absolute -right-5 -bottom-5 w-20 h-20 rounded-full bg-white/10 pointer-events-none" />
-            <div className="absolute right-3 -top-5 w-14 h-14 rounded-full bg-white/10 pointer-events-none" />
+        {/* Account Item Row (Exact match to reference UI: square card flush left, rounded-r-[22px], authentic BRI logo) */}
+        <div className="bg-white flex items-stretch border-b border-slate-100 relative pl-0 pr-4 py-3 sm:py-3.5 select-none">
+          {/* Left: Debit Card Mockup Flush to Left Edge (Exact 1:1 square ratio, rounded-r-[22px], no chip/digits) */}
+          <div className="w-[130px] h-[130px] sm:w-[138px] sm:h-[138px] rounded-r-[22px] rounded-l-none bg-gradient-to-br from-[#07599e] via-[#0b75cb] to-[#07528e] shadow-sm relative overflow-hidden flex-shrink-0 border-y border-r border-white/20">
+            {/* Concentric circular gradient arcs matching real BritAma debit card */}
+            <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full border-[18px] border-white/10 pointer-events-none" />
+            <div className="absolute -left-4 -bottom-4 w-32 h-32 rounded-full border-[10px] border-white/8 pointer-events-none" />
+            <div className="absolute -right-6 -top-8 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
 
-            {/* Official Bank BRI Logo on top right of the card */}
-            <div className="self-end z-10">
-              <svg className="h-3 w-auto" viewBox="0 0 100 28" fill="none">
-                <rect x="1" y="1" width="26" height="26" rx="4" stroke="white" strokeWidth="2.5" fill="none" />
-                <rect x="5.5" y="5.5" width="17" height="17" rx="2.5" stroke="white" strokeWidth="2" fill="none" />
-                <rect x="10" y="10" width="8" height="8" rx="1" fill="white" />
-                <text x="34" y="21" fill="white" fontFamily="sans-serif" fontWeight="900" fontSize="20" letterSpacing="-0.5">BRI</text>
-              </svg>
-            </div>
-
-            {/* Bottom faint card digits */}
-            <div className="text-[7.5px] font-mono text-white/70 tracking-widest z-10">
-              •••• 4532
+            {/* Official Bank BRI Logo (Emblem + BRI Wordmark) positioned top-right */}
+            <div className="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-10">
+              <BankBriLogo className="w-[38px] sm:w-[42px] h-auto drop-shadow-xs" variant="white" />
             </div>
           </div>
 
           {/* Right: Account Info & Balance */}
-          <div className="flex-1 pl-3.5 flex flex-col justify-between">
+          <div className="flex-1 pl-3.5 sm:pl-4 flex flex-col justify-between py-0.5">
             <div>
               {/* Category Pill */}
               <div className="mb-1">
-                <span className="border border-slate-200 bg-white text-slate-500 rounded-full px-2.5 py-0.5 text-[10px] font-medium inline-block">
+                <span className="border border-slate-200/90 bg-white text-slate-500 rounded-full px-2.5 py-0.5 text-[10px] font-medium inline-block shadow-2xs">
                   Belum ada nama kategori
                 </span>
               </div>
@@ -117,7 +109,7 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
               {/* Star + Account Number */}
               <div className="flex items-center space-x-1.5 mt-0.5">
                 <Star size={13} className="fill-amber-400 text-amber-400 flex-shrink-0" />
-                <span className="text-xs font-bold text-slate-900 tracking-tight">
+                <span className="text-xs sm:text-[13px] font-bold text-slate-900 tracking-tight">
                   {user.accountNumber || '3819 0104 6674 532'}
                 </span>
               </div>
@@ -129,14 +121,14 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
             </div>
 
             {/* Balance & Detail Link */}
-            <div className="mt-3 text-right">
-              <div className="text-sm font-black text-slate-900 tracking-tight">
+            <div className="mt-auto pt-2 text-right">
+              <div className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-tight">
                 {formatRupiah(user.balance)}
               </div>
               <button
                 type="button"
                 onClick={() => setShowDetailModal(true)}
-                className="text-xs font-bold text-[#1078CA] inline-flex items-center space-x-0.5 hover:underline active:opacity-70 transition-all mt-0.5"
+                className="text-xs font-bold text-[#1078CA] inline-flex items-center space-x-0.5 hover:underline active:opacity-70 transition-all mt-0.5 justify-end"
               >
                 <span>Lihat Detail</span>
                 <ChevronRight size={13} className="stroke-[2.5]" />
