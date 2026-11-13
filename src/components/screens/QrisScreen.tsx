@@ -510,7 +510,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             setIsProcessingPayment(false);
             setMaintenanceError(true);
             setPin('');
-          }, 4500);
+          }, 7500);
         }, 200);
       }
     }

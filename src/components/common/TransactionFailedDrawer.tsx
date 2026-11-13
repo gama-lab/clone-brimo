@@ -14,7 +14,7 @@ interface TransactionFailedDrawerProps {
 export const TransactionFailedDrawer: React.FC<TransactionFailedDrawerProps> = ({
   isOpen,
   onClose,
-  code = '0201',
+  code = 'MT61',
 }) => {
   if (!isOpen) return null;
 

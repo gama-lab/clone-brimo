@@ -165,7 +165,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
             setIsProcessingTx(false);
             setShowMaintenanceModal(true);
             setPin('');
-          }, 4500);
+          }, 7500);
         } else {
           setPinErrorMsg('PIN yang Anda masukkan salah.');
           setTimeout(() => {
