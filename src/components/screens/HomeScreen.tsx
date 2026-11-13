@@ -152,21 +152,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </div>
 
             {/* Link: Semua Rekeningmu */}
-            <div 
+            <button
+              type="button"
               onClick={() => onNavigate('info-saldo')}
-              className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between cursor-pointer active:opacity-85 transition-opacity"
+              className="w-full mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between text-xs font-semibold text-white/95 hover:text-white cursor-pointer active:opacity-85 transition-opacity"
             >
-              <button
-                type="button"
-                className="text-xs font-semibold text-white/95 hover:text-white flex items-center space-x-1"
-              >
-                <span>Semua Rekeningmu</span>
-                <ChevronRight size={14} />
-              </button>
-              <span className="text-[10px] text-blue-200 font-mono">
-                3819 0104 **** 532
-              </span>
-            </div>
+              <span>Semua Rekeningmu</span>
+              <ChevronRight size={16} className="text-white/90" />
+            </button>
           </div>
         </div>
 
