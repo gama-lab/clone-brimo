@@ -436,5 +436,5 @@ export const NEW_INCOMING_TX: Transaction = {
 
 export const INITIAL_TRANSACTIONS: Transaction[] = [
   NEW_INCOMING_TX,
-  ...mutasiJson,
+  ...(mutasiJson as Transaction[]),
 ];

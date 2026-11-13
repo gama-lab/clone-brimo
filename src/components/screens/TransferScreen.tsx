@@ -13,6 +13,7 @@ import {
   Delete,
   X,
   AlertTriangle,
+  AlertCircle,
   Search
 } from 'lucide-react';
 import { UserProfile, Beneficiary, Bank, Transaction } from '../../types';
