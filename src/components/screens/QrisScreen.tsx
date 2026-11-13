@@ -18,6 +18,7 @@ import { UserProfile, Transaction } from '../../types';
 import { formatRupiah, generateRefNo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
 import { TransactionReceipt } from '../common/TransactionReceipt';
+import { TransactionFailedDrawer } from '../common/TransactionFailedDrawer';
 
 interface QrisScreenProps {
   user: UserProfile;
@@ -508,7 +509,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             setIsProcessingPayment(false);
             setMaintenanceError(true);
             setPin('');
-          }, 2000);
+          }, 4500);
         }, 200);
       }
     }
@@ -964,33 +965,11 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         </div>
       )}
 
-      {/* 6. ERROR TRANSAKSI QRIS OTENTIK ALA BRIMO ([QR-91] Transaksi Belum Dapat Diproses) */}
-      {maintenanceError && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in">
-          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3 animate-sheet-up">
-            <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-2">
-              <AlertCircle size={32} />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full font-mono border border-rose-200">
-                [QR-91] Transaksi Belum Dapat Diproses
-              </span>
-              <h3 className="text-sm font-bold text-slate-900 mt-1.5">Transaksi Belum Dapat Diproses</h3>
-            </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Mohon maaf, pembayaran QRIS belum dapat diselesaikan ke sistem merchant. Silakan pastikan koneksi internet stabil atau coba beberapa saat lagi.
-            </p>
-            <div className="pt-2 space-y-2">
-              <button
-                onClick={() => setMaintenanceError(false)}
-                className="w-full py-3 bg-[#1078CA] hover:bg-[#0d64a8] text-white font-bold text-xs rounded-xl shadow-md active:scale-95 transition-all"
-              >
-                Kembali
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 6. ERROR TRANSAKSI QRIS BOTTOM DRAWER (Transaksi Belum Berhasil - Kode : FP2700) */}
+      <TransactionFailedDrawer
+        isOpen={maintenanceError}
+        onClose={() => setMaintenanceError(false)}
+      />
     </div>
   );
 };

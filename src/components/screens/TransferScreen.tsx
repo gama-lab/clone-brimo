@@ -13,7 +13,6 @@ import {
   Delete,
   X,
   AlertTriangle,
-  AlertCircle,
   Search
 } from 'lucide-react';
 import { UserProfile, Beneficiary, Bank, Transaction } from '../../types';
@@ -21,6 +20,7 @@ import { SUPPORTED_BANKS, INITIAL_BENEFICIARIES, RECENT_TRANSFERS } from '../../
 import { formatRupiah, formatDateIndo, generateRefNo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
 import { TransactionReceipt } from '../common/TransactionReceipt';
+import { TransactionFailedDrawer } from '../common/TransactionFailedDrawer';
 
 interface TransferScreenProps {
   user: UserProfile;
@@ -166,7 +166,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
             setIsProcessingTx(false);
             setShowMaintenanceModal(true);
             setPin('');
-          }, 2400);
+          }, 4500);
         } else {
           setPinErrorMsg('PIN yang Anda masukkan salah.');
           setTimeout(() => {
@@ -1053,37 +1053,14 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* ERROR TRANSAKSI GAGAL OTENTIK ALA BRIMO ([99] Transaksi Belum Dapat Diproses) */}
-      {showMaintenanceModal && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
-          <div className="bg-white rounded-3xl p-6 text-slate-800 w-full max-w-xs text-center shadow-2xl space-y-3.5 animate-sheet-up">
-            <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-1">
-              <AlertCircle size={32} />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full font-mono">
-                [99] Transaksi Tidak Dapat Diproses
-              </span>
-              <h3 className="text-sm font-bold text-slate-900 mt-2">Transaksi Belum Dapat Diproses</h3>
-            </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Mohon maaf, transaksi Anda belum dapat diproses saat ini. Silakan pastikan jaringan internet Anda stabil dan coba beberapa saat lagi.
-            </p>
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowMaintenanceModal(false);
-                  setPin('');
-                }}
-                className="w-full py-3 bg-[#1078CA] hover:bg-[#0d64a8] active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all"
-              >
-                Kembali
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ERROR TRANSAKSI GAGAL BOTTOM DRAWER (Transaksi Belum Berhasil - Kode : FP2700) */}
+      <TransactionFailedDrawer
+        isOpen={showMaintenanceModal}
+        onClose={() => {
+          setShowMaintenanceModal(false);
+          setPin('');
+        }}
+      />
 
       {/* 6. TRANSFER SUCCESS RECEIPT (from WhatsApp Image 2026-10-31 at 16.03.18 (1).jpeg) */}
       {subStep === 'receipt' && completedTx && (

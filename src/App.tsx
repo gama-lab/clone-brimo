@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Screen, UserProfile, Transaction } from './types';
 import { INITIAL_USER, INITIAL_TRANSACTIONS } from './data/mockData';
-import { initTransactionsDB, addTransactionToDB } from './utils/indexedDB';
 import { LoginScreen } from './components/screens/LoginScreen';
 import { HomeScreen } from './components/screens/HomeScreen';
 import { MutasiScreen } from './components/screens/MutasiScreen';
@@ -16,42 +15,13 @@ import { BrimoAlertModal, BrimoAlertData } from './components/common/BrimoAlertM
 
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('login');
-  const [user, setUser] = useState<UserProfile>(() => {
-    if (typeof window !== 'undefined') {
-      const savedBalance = localStorage.getItem('brimo_user_balance');
-      if (savedBalance !== null) {
-        const num = Number(savedBalance);
-        if (!isNaN(num)) {
-          return { ...INITIAL_USER, balance: num };
-        }
-      }
-    }
-    return INITIAL_USER;
-  });
+  const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [isScreenLoading, setIsScreenLoading] = useState(false);
   const [alertData, setAlertData] = useState<BrimoAlertData>({
     isOpen: false,
     title: '',
   });
-
-  // Initialize and load transactions from IndexedDB
-  useEffect(() => {
-    let isMounted = true;
-    initTransactionsDB(INITIAL_TRANSACTIONS)
-      .then((data) => {
-        if (isMounted) {
-          setTransactions(data);
-        }
-      })
-      .catch((err) => {
-        console.warn('Failed to initialize IndexedDB transactions:', err);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Global override of browser alert to custom authentic BRImo alert modal
   useEffect(() => {
@@ -99,24 +69,16 @@ export const App: React.FC = () => {
     setCurrentScreen('login');
   };
 
-  // Handle transfer completed - Persist to IndexedDB
+  // Handle transfer completed
   const handleCompleteTransfer = (newTx: Transaction, newBalance: number) => {
-    addTransactionToDB(newTx);
-    setTransactions(prev => [newTx, ...prev]);
+    setTransactions([newTx, ...transactions]);
     setUser(prev => ({ ...prev, balance: newBalance }));
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('brimo_user_balance', String(newBalance));
-    }
   };
 
-  // Handle QRIS payment completed - Persist to IndexedDB
+  // Handle QRIS payment completed
   const handleQrisPayment = (newTx: Transaction, newBalance: number) => {
-    addTransactionToDB(newTx);
-    setTransactions(prev => [newTx, ...prev]);
+    setTransactions([newTx, ...transactions]);
     setUser(prev => ({ ...prev, balance: newBalance }));
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('brimo_user_balance', String(newBalance));
-    }
   };
 
   const showBottomNav =
