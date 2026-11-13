@@ -1,5 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import brokenCardImg from '../../assets/broken-card-bri.png';
+
+// Preload & decode broken card asset early so it appears instantaneously with the drawer
+if (typeof window !== 'undefined') {
+  const preload = new Image();
+  preload.src = brokenCardImg;
+  preload.decode?.().catch(() => {});
+}
 
 interface TransactionFailedDrawerProps {
   isOpen: boolean;
@@ -16,11 +23,17 @@ export const TransactionFailedDrawer: React.FC<TransactionFailedDrawerProps> = (
   onClose,
   code = 'MT05',
 }) => {
+  useEffect(() => {
+    const img = new Image();
+    img.src = brokenCardImg;
+    img.decode?.().catch(() => {});
+  }, []);
+
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex flex-col justify-end select-none animate-in fade-in duration-200"
+      className="fixed inset-0 bg-slate-900/45 backdrop-blur-[2px] z-50 flex flex-col justify-end select-none animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
@@ -32,6 +45,8 @@ export const TransactionFailedDrawer: React.FC<TransactionFailedDrawerProps> = (
           <img
             src={brokenCardImg}
             alt="Transaksi Belum Berhasil"
+            loading="eager"
+            decoding="sync"
             className="w-48 h-auto object-contain select-none pointer-events-none"
             draggable={false}
           />
