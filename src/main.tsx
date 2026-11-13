@@ -6,7 +6,7 @@ import './index.css';
 // Register Service Worker for Chrome PWA installability with immediate update check
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then((reg) => {
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then((reg) => {
       reg.update();
     }).catch((err) => {
       console.warn('SW registration info:', err);

@@ -6,11 +6,8 @@ import {
   ChevronDown, 
   ChevronRight, 
   FileText, 
-  ShieldCheck, 
-  CheckCircle2, 
   Share2, 
   Download,
-  Delete,
   X,
   AlertTriangle,
   Search
@@ -19,6 +16,8 @@ import { UserProfile, Beneficiary, Bank, Transaction } from '../../types';
 import { SUPPORTED_BANKS, INITIAL_BENEFICIARIES, RECENT_TRANSFERS } from '../../data/mockData';
 import { formatRupiah, formatDateIndo, generateRefNo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
+import { PinOverlay } from '../common/PinOverlay';
+import { BrimoDotsLoading } from '../common/BrimoDotsLoading';
 import { TransactionReceipt } from '../common/TransactionReceipt';
 import { TransactionFailedDrawer } from '../common/TransactionFailedDrawer';
 
@@ -463,17 +462,10 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
       {/* 2. PENERIMA BARU (from WhatsApp Image 2026-10-31 at 15.30.25 (2).jpeg) */}
       {subStep === 'new_recipient' && (
         <div className="flex-1 flex flex-col h-full overflow-hidden">
-          {/* Top Bar with Lingkungan Aman */}
+          {/* Top Bar */}
           <div className="bg-[#1078CA] text-white pt-1 pb-4 px-4 flex-shrink-0 z-30 shadow-sm">
               <StatusBar darkTheme={true} />
-              <div className="flex items-center justify-between text-right text-[10px] text-white/90 font-medium px-1 mb-1">
-                <span />
-                <span className="flex items-center space-x-1">
-                  <ShieldCheck size={12} className="text-emerald-300" />
-                  <span>Lingkungan Aman</span>
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mt-1">
                 <button onClick={() => setSubStep('home')} className="p-1 hover:bg-white/10 rounded-full">
                   <ArrowLeft size={22} />
                 </button>
@@ -548,31 +540,9 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                     className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-[#1078CA]"
                   />
                 </div>
-                {detectedRecipient ? (
-                  <div className="mt-2.5 bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-1 duration-200 shadow-xs">
-                    <div className="flex items-center space-x-2.5">
-                      <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-xs ${detectedRecipient.avatarBg}`}>
-                        {detectedRecipient.initials}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-1.5">
-                          <span className="text-xs font-bold text-slate-900">{detectedRecipient.name}</span>
-                          <CheckCircle2 size={13} className="text-emerald-600 flex-shrink-0" />
-                        </div>
-                        <p className="text-[10px] text-slate-500 font-medium">
-                          {detectedRecipient.bankName} • {targetAccountNumber}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      Terbaca
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-[10px] text-slate-400 block mt-1 pl-1">
-                    Masukkan alias diawali dengan "@"
-                  </span>
-                )}
+                <span className="text-[10px] text-slate-400 block mt-1 pl-1">
+                  Masukkan alias diawali dengan "@"
+                </span>
               </div>
 
               {/* Info Note: Alias digunakan sebagai alternatif */}
@@ -661,6 +631,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                       <span className="text-slate-400 font-bold mr-1 text-xl">Rp</span>
                       <input
                         type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={nominalAmount}
                         onChange={(e) => {
                           const val = e.target.value.replace(/\D/g, '');
@@ -832,146 +804,28 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
 
       {/* 5. PIN SCREEN */}
       {subStep === 'pin' && (
-        <div className="flex-1 bg-white flex flex-col justify-between p-6 pb-[max(1.5rem,env(safe-area-inset-bottom,1.5rem))] h-full overflow-hidden">
-          <StatusBar darkTheme={false} />
-          <div className="flex items-center justify-between pt-2">
-            <button onClick={() => setSubStep('confirm')} className="p-1 rounded-full text-slate-700">
-              <ArrowLeft size={22} />
-            </button>
-            <span className="text-xs font-bold text-slate-400 tracking-wider">PIN BRImo</span>
-            <div className="w-8" />
-          </div>
-
-          <div className="text-center my-6">
-            <h2 className="text-lg font-bold text-slate-900">Masukkan PIN BRImo</h2>
-            <p className="text-xs text-slate-400 mt-1">Jaga kerahasiaan PIN Anda</p>
-            <div className="flex items-center justify-center space-x-4 mt-8">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div
-                  key={idx}
-                  className={`w-3.5 h-3.5 rounded-full border-2 transition-all ${
-                    pin.length > idx ? 'bg-[#1078CA] border-[#1078CA] scale-110' : 'border-slate-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="max-w-xs mx-auto w-full pb-4">
-            <div className="grid grid-cols-3 gap-y-4 gap-x-6 text-center">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                <button
-                  key={digit}
-                  onClick={() => handleKeypadPress(digit)}
-                  className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 active:bg-blue-100 font-bold text-xl text-slate-800 mx-auto flex items-center justify-center transition-colors"
-                >
-                  {digit}
-                </button>
-              ))}
-              <div className="w-16 h-16" />
-              <button
-                onClick={() => handleKeypadPress('0')}
-                className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 active:bg-blue-100 font-bold text-xl text-slate-800 mx-auto flex items-center justify-center transition-colors"
-              >
-                0
-              </button>
-              <button
-                onClick={handleKeypadDelete}
-                className="w-16 h-16 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 mx-auto flex items-center justify-center"
-              >
-                <Delete size={20} />
-              </button>
-            </div>
-          </div>
-        </div>
+        <PinOverlay
+          pin={pin}
+          errorMsg={pinErrorMsg}
+          onDigitPress={handleKeypadPress}
+          onDelete={handleKeypadDelete}
+          onClose={() => setSubStep('confirm')}
+        />
       )}
 
-      {/* FULL-SCREEN SEMI-BLUR FROSTED GLASS PIN UI (User Rule: semi2 blur, ga terlalu putih dan ga terlalu hitam, tombol putih teks hitam) */}
+      {/* FULL-SCREEN FROSTED GLASS PIN UI */}
       {showPinModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-md flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
-          {/* Top Bar Header */}
-          <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-center">
-            <span className="text-xs font-bold text-white/90 drop-shadow-sm tracking-widest uppercase">
-              PIN Transaksi
-            </span>
-          </div>
-
-          {/* Center Area: Title & 6 PIN Bullets (Tanpa keterangan penerima & nominal) */}
-          <div className="text-center my-auto py-2">
-            <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-md">
-              Masukkan PIN BRImo
-            </h2>
-            <p className="text-xs text-white/90 mt-1.5 font-medium drop-shadow-sm">
-              Jaga kerahasiaan PIN Anda
-            </p>
-
-            {/* 6 PIN Bullets */}
-            <div className="flex items-center justify-center space-x-4 mt-8">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div
-                  key={idx}
-                  className={`w-4 h-4 rounded-full border-2 transition-all duration-150 ${
-                    pinErrorMsg
-                      ? 'bg-rose-500 border-rose-500 animate-shake'
-                      : pin.length > idx
-                      ? 'bg-white border-white scale-110 shadow-[0_0_12px_rgba(255,255,255,0.9)]'
-                      : 'border-white/60 bg-white/20 backdrop-blur-xs'
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Error text if wrong PIN */}
-            {pinErrorMsg && (
-              <p className="text-xs font-bold text-rose-300 drop-shadow mt-3 animate-in fade-in">
-                {pinErrorMsg}
-              </p>
-            )}
-          </div>
-
-          {/* Bottom Area: Semi-frosted White Numpad Buttons with Black Text */}
-          <div className="max-w-xs mx-auto w-full pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
-            <div className="grid grid-cols-3 gap-y-4 gap-x-6 text-center">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                <button
-                  key={digit}
-                  type="button"
-                  onClick={() => handleKeypadPress(digit)}
-                  className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                >
-                  {digit}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPinModal(false);
-                  setPin('');
-                  setPinErrorMsg('');
-                }}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                title="Batal / Tutup PIN"
-              >
-                <X size={22} className="stroke-[2.5]" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleKeypadPress('0')}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-              >
-                0
-              </button>
-              <button
-                type="button"
-                onClick={handleKeypadDelete}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                title="Hapus Digit"
-              >
-                <Delete size={22} className="text-slate-900" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <PinOverlay
+          pin={pin}
+          errorMsg={pinErrorMsg}
+          onDigitPress={handleKeypadPress}
+          onDelete={handleKeypadDelete}
+          onClose={() => {
+            setShowPinModal(false);
+            setPin('');
+            setPinErrorMsg('');
+          }}
+        />
       )}
 
       {/* DAFTAR BANK BOTTOM SHEET MODAL (Exact match to user reference media_1793440655584_f7c42ff3.png) */}
@@ -1044,14 +898,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* PROCESSING TRANSACTION LOADING (Pure loading state without server text) */}
-      {isProcessingTx && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
-          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
-            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
-          </div>
-        </div>
-      )}
+      {/* PROCESSING TRANSACTION LOADING AFTER PIN (6-dot fluid wave) */}
+      {isProcessingTx && <BrimoDotsLoading />}
 
       {/* ERROR TRANSAKSI GAGAL BOTTOM DRAWER (Transaksi Belum Berhasil - Kode : FP2700) */}
       <TransactionFailedDrawer

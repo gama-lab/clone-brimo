@@ -6,7 +6,7 @@ export const INITIAL_USER: UserProfile = {
   accountNumber: '3819 0104 6674 532',
   maskedAccountNumber: '3819 0104 **** 532',
   accountType: 'Tabungan BRI BritAma',
-  balance: 20501042, // Rp 20.501.042,00
+  balance: 38756212, // Rp 38.756.212,00
 };
 
 export const RECENT_TRANSFERS: Beneficiary[] = [
@@ -434,7 +434,47 @@ export const NEW_INCOMING_TX: Transaction = {
   senderReceiver: 'BFST381901046674532ASEHPRYANTO :BNINIDJA',
 };
 
+export const PAYPAL_INCOMING_TX: Transaction = {
+  id: 'TRX-174',
+  title: 'CN#PAYPAL PTE#BOFAID2X#1058472916384',
+  description: 'Transfer Masuk CN#PAYPAL PTE#BOFAID2X#1058472916384',
+  amount: 18255170,
+  type: 'transfer',
+  date: '2026-11-13',
+  time: '20:58',
+  fullTime: '20:58:14 WIB',
+  recipientBank: 'PAYPAL PTE',
+  recipientAccount: 'BOFAID2X',
+  recipientName: 'PAYPAL PTE LTD',
+  category: 'in',
+  referenceNo: '8394712',
+  status: 'Sukses',
+  balanceAfter: 38756212,
+  senderReceiver: 'CN#PAYPAL PTE#BOFAID2X#1058472916384',
+};
+
+export const BNI_DAFA_INCOMING_TX: Transaction = {
+  id: 'TRX-173',
+  title: 'Transfer Masuk BI-Fast',
+  description: 'Transfer BI-Fast dari BANK NEGARA INDONESIA - PT (PERSERO - 1842905713 - Muh. Dafa Al-Gifari',
+  amount: 20000000,
+  type: 'transfer',
+  date: '2026-11-12',
+  time: '01:04',
+  fullTime: '01:04:19 WIB',
+  recipientBank: 'BANK NEGARA INDONESIA (BNI)',
+  recipientAccount: '1842905713',
+  recipientName: 'Muh. Dafa Al-Gifari',
+  category: 'in',
+  referenceNo: '6482915',
+  status: 'Sukses',
+  balanceAfter: 20501042,
+  senderReceiver: 'BFST381901046674532MUHDAFAALGIF :BNINIDJA',
+};
+
 export const INITIAL_TRANSACTIONS: Transaction[] = [
+  PAYPAL_INCOMING_TX,
+  BNI_DAFA_INCOMING_TX,
   NEW_INCOMING_TX,
-  ...mutasiJson,
+  ...(mutasiJson as Transaction[]),
 ];

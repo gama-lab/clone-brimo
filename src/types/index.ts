@@ -19,6 +19,7 @@ export interface Transaction {
   type: TransactionType;
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
+  fullTime?: string; // HH:mm:ss WIB
   recipientBank?: string;
   recipientAccount?: string;
   recipientName?: string;
