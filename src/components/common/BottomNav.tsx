@@ -40,20 +40,36 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         <span className="text-[10px] mt-0.5 font-medium">Mutasi</span>
       </button>
 
-      {/* Center Floating QRIS Button (Exact match to Photo on 31-10-26 at 15.09 #2.jpg) */}
+      {/* Center Floating QRIS Button */}
       <div className="flex-1 flex flex-col items-center justify-center relative -top-4 pointer-events-auto">
         <button
           type="button"
           onClick={() => onNavigate('qris')}
-          className="w-14 h-14 rounded-full bg-[#1078CA] text-white shadow-[0_8px_20px_rgba(16,120,202,0.45)] ring-4 ring-white active:scale-90 transition-all flex items-center justify-center"
+          className="w-[62px] h-[62px] rounded-full bg-white p-[4.5px] shadow-[0_4px_16px_rgba(16,120,202,0.35),0_2px_6px_rgba(0,0,0,0.14)] active:scale-90 transition-all flex items-center justify-center"
           title="Scan QRIS"
+          aria-label="Scan QRIS"
         >
-          <img
-            src={qrisLogoWhite}
-            alt="QRIS"
-            draggable={false}
-            className="w-10 h-auto object-contain pointer-events-none select-none"
-          />
+          <span className="w-full h-full rounded-full bg-gradient-to-b from-[#1684DA] to-[#0D6DC0] flex items-center justify-center">
+            <span className="relative w-[36px] h-[36px] flex items-center justify-center">
+              <svg
+                viewBox="0 0 36 36"
+                fill="none"
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full pointer-events-none"
+              >
+                <path d="M2 10.5V3.5A1.5 1.5 0 0 1 3.5 2H10.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M25.5 2H32.5A1.5 1.5 0 0 1 34 3.5V10.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M2 25.5V32.5A1.5 1.5 0 0 0 3.5 34H10.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M25.5 34H32.5A1.5 1.5 0 0 0 34 32.5V25.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <img
+                src={qrisLogoWhite}
+                alt="QRIS"
+                draggable={false}
+                className="w-[24px] h-auto object-contain pointer-events-none select-none"
+              />
+            </span>
+          </span>
         </button>
       </div>
 
