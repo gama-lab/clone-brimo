@@ -10,14 +10,15 @@ import {
   AlertCircle,
   AlertTriangle,
   X,
-  Camera,
-  Delete
+  Camera
 } from 'lucide-react';
 import jsQR from 'jsqr';
 import { UserProfile, Transaction } from '../../types';
 import { formatRupiah, generateRefNo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
 import { TransactionReceipt } from '../common/TransactionReceipt';
+import { PinOverlay } from '../common/PinOverlay';
+import { BrimoDotsLoading } from '../common/BrimoDotsLoading';
 import { TransactionFailedDrawer } from '../common/TransactionFailedDrawer';
 
 interface QrisScreenProps {
@@ -838,100 +839,30 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
       {/* PIN Modal (Frosted Glass UI Otentik ala BRImo) */}
       {showPinModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-md flex flex-col justify-between p-6 select-none animate-in fade-in duration-200 text-white">
-          {/* Top Bar Header */}
-          <div className="pt-[max(0.5rem,env(safe-area-inset-top,0.5rem))] flex items-center justify-center">
-            <span className="text-xs font-bold text-white/90 drop-shadow-sm tracking-widest uppercase">
-              PIN Transaksi
-            </span>
-          </div>
-
-          {/* Center Area: Title & 6 PIN Bullets */}
-          <div className="text-center my-auto py-2">
-            <h2 className="text-2xl font-black text-white tracking-tight drop-shadow-md">
-              Masukkan PIN BRImo
-            </h2>
-            <p className="text-xs text-white/90 mt-1.5 font-medium drop-shadow-sm">
-              Jaga kerahasiaan PIN Anda
-            </p>
-
-            {/* 6 PIN Bullets */}
-            <div className="flex items-center justify-center space-x-4 mt-8">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
-                <div
-                  key={idx}
-                  className={`w-4 h-4 rounded-full border-2 transition-all duration-150 ${
-                    pinErrorMsg
-                      ? 'bg-rose-500 border-rose-500 animate-shake'
-                      : pin.length > idx
-                      ? 'bg-white border-white scale-110 shadow-[0_0_12px_rgba(255,255,255,0.9)]'
-                      : 'border-white/60 bg-white/20 backdrop-blur-xs'
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Error text if any */}
-            {pinErrorMsg && (
-              <p className="text-xs font-bold text-rose-300 drop-shadow mt-3 animate-in fade-in">
-                {pinErrorMsg}
-              </p>
-            )}
-          </div>
-
-          {/* Bottom Area: Semi-frosted White Numpad Buttons with Black Text */}
-          <div className="max-w-xs mx-auto w-full pb-[max(1rem,env(safe-area-inset-bottom,1rem))]">
-            <div className="grid grid-cols-3 gap-y-4 gap-x-6 text-center">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                <button
-                  key={digit}
-                  type="button"
-                  onClick={() => handleKeypadPress(digit)}
-                  className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                >
-                  {digit}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPinModal(false);
-                  setPin('');
-                  setPinErrorMsg('');
-                }}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                title="Batal / Tutup PIN"
-              >
-                <X size={22} className="stroke-[2.5]" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleKeypadPress('0')}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 font-bold text-2xl mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-              >
-                0
-              </button>
-              <button
-                type="button"
-                onClick={handleKeypadDelete}
-                className="w-16 h-16 rounded-full bg-white/85 hover:bg-white active:bg-white/70 backdrop-blur-md border border-white/50 text-slate-900 mx-auto flex items-center justify-center active:scale-95 transition-all shadow-md"
-                title="Hapus Digit"
-              >
-                <Delete size={22} className="text-slate-900" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <PinOverlay
+          pin={pin}
+          errorMsg={pinErrorMsg}
+          onDigitPress={handleKeypadPress}
+          onDelete={handleKeypadDelete}
+          onClose={() => {
+            setShowPinModal(false);
+            setPin('');
+            setPinErrorMsg('');
+          }}
+        />
       )}
 
-      {/* 4. Processing QR Code / Transaction (Pure loading state without text) */}
-      {(isProcessingQR || isProcessingPayment) && (
+      {/* 4a. Processing QR Code scan */}
+      {isProcessingQR && !isProcessingPayment && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
           <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
             <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
           </div>
         </div>
       )}
+
+      {/* 4b. Post-PIN Transaction Loading (6-dot fluid wave) */}
+      {isProcessingPayment && <BrimoDotsLoading />}
 
       {/* 5. GAGAL: Bukan Barcode (User Rule: kalau bukan barcode langsung gagal) */}
       {notQrError && (

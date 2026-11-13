@@ -172,3 +172,17 @@
   background-size: 200% 100%;
   animation: skeletonShimmer 1.4s ease-in-out infinite;
 }
+
+/* BRImo 6-dot fluid upward wave loading (moves only upward from baseline) */
+@keyframes brimoDotRise {
+  0%, 70%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  35% {
+    transform: translate3d(0, -13px, 0);
+  }
+}
+
+.animate-brimo-dot {
+  animation: brimoDotRise 1.15s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
