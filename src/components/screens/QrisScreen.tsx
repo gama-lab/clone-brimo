@@ -390,7 +390,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             setTimeout(() => {
               setIsProcessingQR(false);
               setStep('input_nominal');
-            }, 800);
+            }, 1400);
             return;
           }
         }
@@ -465,7 +465,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
             setTimeout(() => {
               setIsProcessingQR(false);
               setStep('input_nominal');
-            }, 800);
+            }, 1400);
           }
         } catch (err) {
           setIsProcessingQR(false);
@@ -852,17 +852,8 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         />
       )}
 
-      {/* 4a. Processing QR Code scan */}
-      {isProcessingQR && !isProcessingPayment && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in select-none">
-          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
-            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
-          </div>
-        </div>
-      )}
-
-      {/* 4b. Post-PIN Transaction Loading (6-dot fluid wave) */}
-      {isProcessingPayment && <BrimoDotsLoading />}
+      {/* 4. QR & Transaction Loading (6-dot fluid wave) */}
+      {(isProcessingQR || isProcessingPayment) && <BrimoDotsLoading />}
 
       {/* 5. GAGAL: Bukan Barcode (User Rule: kalau bukan barcode langsung gagal) */}
       {notQrError && (

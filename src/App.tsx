@@ -12,12 +12,14 @@ import { InfoSaldoScreen } from './components/screens/InfoSaldoScreen';
 import { BottomNav } from './components/common/BottomNav';
 import { HomeSkeleton, MutasiSkeleton, AktivitasSkeleton } from './components/common/ScreenSkeletons';
 import { BrimoAlertModal, BrimoAlertData } from './components/common/BrimoAlertModal';
+import { BrimoDotsLoading } from './components/common/BrimoDotsLoading';
 
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('login');
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [isScreenLoading, setIsScreenLoading] = useState(false);
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
   const [alertData, setAlertData] = useState<BrimoAlertData>({
     isOpen: false,
     title: '',
@@ -39,19 +41,22 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Navigate handler with smooth realistic skeleton shimmer transition
+  // Navigate handler with smooth realistic transition
   const handleNavigate = (screen: Screen) => {
     if (screen === currentScreen) return;
 
-    // Apply quick skeleton loading on primary tab switches
     if (screen === 'home' || screen === 'mutasi' || screen === 'aktivitas') {
       setIsScreenLoading(true);
       setCurrentScreen(screen);
       setTimeout(() => {
         setIsScreenLoading(false);
-      }, 350);
+      }, 850);
     } else {
-      setCurrentScreen(screen);
+      setIsRouteLoading(true);
+      setTimeout(() => {
+        setCurrentScreen(screen);
+        setIsRouteLoading(false);
+      }, 750);
     }
   };
 
@@ -61,7 +66,7 @@ export const App: React.FC = () => {
     setCurrentScreen('home');
     setTimeout(() => {
       setIsScreenLoading(false);
-    }, 400);
+    }, 900);
   };
 
   // Logout handler
@@ -168,6 +173,9 @@ export const App: React.FC = () => {
           />
         </div>
       )}
+
+      {/* Global Route Transition Loading (6-dot fluid wave) */}
+      {isRouteLoading && <BrimoDotsLoading />}
 
       {/* Global Custom BRImo Alert Modal (replaces all native browser alerts) */}
       <BrimoAlertModal

@@ -240,7 +240,7 @@ export const INITIAL_BENEFICIARIES: Beneficiary[] = [
   },
   {
     id: 'ben-nurmiati',
-    name: 'Nurmiati',
+    name: 'NURMIATI',
     accountNumber: '491001007200537',
     bankName: 'BANK BRI',
     bankCode: '002',

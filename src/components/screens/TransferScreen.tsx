@@ -92,7 +92,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     setTimeout(() => {
       setIsLoadingRecipient(false);
       setSubStep('input_nominal');
-    }, 700);
+    }, 1300);
   };
 
   const handleAddNewRecipientWithLoading = () => {
@@ -128,7 +128,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
     setTimeout(() => {
       setIsLoadingRecipient(false);
       setSubStep('input_nominal');
-    }, 600);
+    }, 1200);
   };
 
   // Form Nominal state
@@ -689,9 +689,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
                 <label className="text-xs font-bold text-slate-800 block mb-1">Sumber Dana</label>
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between relative overflow-hidden">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-full bg-blue-50/80 flex flex-col items-center justify-center text-center p-1 border border-blue-100">
-                      <span className="text-[7px] text-[#1078CA] font-semibold leading-none">Tabungan BRI</span>
-                      <span className="text-[9px] text-[#1078CA] font-black leading-tight">BritAma</span>
+                    <div className="w-12 h-12 rounded-full bg-blue-50/80 flex items-center justify-center text-center border border-blue-100">
+                      <span className="text-sm text-[#1078CA] font-bold tracking-tight">HP</span>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-800 font-mono">3819 0104 6674 532</p>
@@ -889,17 +888,8 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
         </div>
       )}
 
-      {/* PURE LOADING SPINNER ANIMATION ONLY (No text) */}
-      {isLoadingRecipient && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in duration-100 select-none">
-          <div className="w-20 h-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 animate-in zoom-in-95 duration-150">
-            <div className="w-10 h-10 border-4 border-[#1078CA]/25 border-t-[#1078CA] rounded-full animate-spin" />
-          </div>
-        </div>
-      )}
-
-      {/* PROCESSING TRANSACTION LOADING AFTER PIN (6-dot fluid wave) */}
-      {isProcessingTx && <BrimoDotsLoading />}
+      {/* LOADING OVERLAY (6-dot fluid wave) */}
+      {(isLoadingRecipient || isProcessingTx) && <BrimoDotsLoading />}
 
       {/* ERROR TRANSAKSI GAGAL BOTTOM DRAWER (Transaksi Belum Berhasil - Kode : FP2700) */}
       <TransactionFailedDrawer

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { BrimoLogo, BrimoAppIcon } from '../common/BrimoLogo';
 import { StatusBar } from '../common/StatusBar';
+import { BrimoDotsLoading } from '../common/BrimoDotsLoading';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -236,11 +237,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 disabled={isLoading}
                 className="w-full py-3.5 bg-[#1078CA] hover:bg-[#0c62a8] text-white font-bold text-xs rounded-xl shadow-md active:scale-[0.99] transition-all flex items-center justify-center space-x-2"
               >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <span>Login</span>
-                )}
+                <span>Login</span>
               </button>
 
               {/* Forgot link */}
@@ -257,6 +254,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
       )}
+
+      {isLoading && <BrimoDotsLoading />}
     </div>
   );
 };
