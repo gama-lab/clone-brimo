@@ -14,6 +14,8 @@ import { UserProfile, Transaction, Screen } from '../../types';
 import { formatRupiah } from '../../utils/format';
 import { BrimoLogo } from '../common/BrimoLogo';
 import { StatusBar } from '../common/StatusBar';
+import { PullToRefreshContainer } from '../common/PullToRefreshContainer';
+import { HomeBodySkeleton } from '../common/ScreenSkeletons';
 import { 
   IconBrimoTransfer, 
   IconBrimoBriva, 
@@ -119,8 +121,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Scrollable Home Content Body */}
-      <div className="flex-1 min-h-0 native-scroll pb-6">
+      {/* Scrollable Home Content Body with Native Pull-to-Refresh */}
+      <PullToRefreshContainer tone="blue" skeleton={<HomeBodySkeleton />} className="pb-6">
         {/* Blue Curved Saldo Container */}
         <div className="bg-[#1078CA] text-white pt-1.5 pb-6 px-4 rounded-b-[2rem] shadow-sm relative">
           {/* Decorative layer is clipped on its own so it can never crop the content cards */}
@@ -326,7 +328,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         </div>
         </div>
-      </div>
+      </PullToRefreshContainer>
     </div>
   );
 };

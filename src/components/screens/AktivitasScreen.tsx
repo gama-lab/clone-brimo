@@ -3,6 +3,8 @@ import { SlidersHorizontal, ArrowLeft, Filter } from 'lucide-react';
 import { Transaction, UserProfile, Screen } from '../../types';
 import { formatRupiah, formatDateIndo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
+import { PullToRefreshContainer } from '../common/PullToRefreshContainer';
+import { AktivitasBodySkeleton } from '../common/ScreenSkeletons';
 import { TransactionReceipt } from '../common/TransactionReceipt';
 import { classifyTransaction } from '../../utils/transactionHelper';
 
@@ -119,8 +121,9 @@ export const AktivitasScreen: React.FC<AktivitasScreenProps> = ({
         </div>
       </div>
 
-      {/* Scrollable List Items (Differentiated by category) */}
-      <div className="flex-1 min-h-0 native-scroll p-3 pb-6 space-y-2.5">
+      {/* Scrollable List Items with Native Pull-to-Refresh */}
+      <PullToRefreshContainer tone="light" skeleton={<AktivitasBodySkeleton />} className="pb-6">
+        <div className="p-3 space-y-2.5">
         {displayedTransactions.length === 0 ? (
           <div className="py-12 text-center text-slate-400">
             <Filter size={32} className="mx-auto mb-2 opacity-40" />
@@ -188,7 +191,8 @@ export const AktivitasScreen: React.FC<AktivitasScreenProps> = ({
             );
           })
         )}
-      </div>
+        </div>
+      </PullToRefreshContainer>
 
       {/* Receipt Modal on click */}
       {selectedTx && (

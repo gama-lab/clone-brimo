@@ -18,6 +18,8 @@ import {
 import { Transaction, UserProfile, Screen } from '../../types';
 import { formatRupiah, formatDateIndo } from '../../utils/format';
 import { StatusBar } from '../common/StatusBar';
+import { PullToRefreshContainer } from '../common/PullToRefreshContainer';
+import { MutasiBodySkeleton } from '../common/ScreenSkeletons';
 
 interface MutasiScreenProps {
   user: UserProfile;
@@ -158,8 +160,9 @@ export const MutasiScreen: React.FC<MutasiScreenProps> = ({
         </div>
       </div>
 
-      {/* Scrollable Grouped Transactions List */}
-      <div className="flex-1 min-h-0 native-scroll p-4 pb-6 space-y-4">
+      {/* Scrollable Grouped Transactions List with Native Pull-to-Refresh */}
+      <PullToRefreshContainer tone="light" skeleton={<MutasiBodySkeleton />} className="pb-6">
+        <div className="p-4 space-y-4">
         {Object.keys(grouped).length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-slate-100 mt-4">
             <Receipt size={32} className="text-slate-300 mx-auto mb-2" />
@@ -211,7 +214,8 @@ export const MutasiScreen: React.FC<MutasiScreenProps> = ({
             </div>
           ))
         )}
-      </div>
+        </div>
+      </PullToRefreshContainer>
 
       {/* Transaction Detail Receipt Sheet */}
       {selectedTx && (
