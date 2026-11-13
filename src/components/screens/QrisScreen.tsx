@@ -207,12 +207,10 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
   onPaymentSuccess,
 }) => {
   const [step, setStep] = useState<QrisStep>('scan');
+  const [qrMode, setQrMode] = useState<'bayar' | 'transfer'>('bayar');
   const [flashlightOn, setFlashlightOn] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(false);
-  const [showPermissionDialog, setShowPermissionDialog] = useState<boolean>(() => {
-    return localStorage.getItem('brimo_camera_permission') !== 'granted';
-  });
 
   // Gallery and transaction detection states
   const [isProcessingQR, setIsProcessingQR] = useState(false);
@@ -277,60 +275,77 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
 
   const numAmount = parseInt(nominalStr.replace(/\D/g, '') || '0', 10);
 
-  // Function to request camera permission and start video stream
-  const requestCameraPermission = async () => {
-    setShowPermissionDialog(false);
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraError(true);
-        return;
-      }
-
-      let stream: MediaStream;
-      try {
-        // Try back / environment camera first
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false,
-        });
-      } catch (err) {
-        // Fallback for laptop / Mac / front camera
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-      }
-
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => {});
-      }
-      setCameraActive(true);
-      setCameraError(false);
-      localStorage.setItem('brimo_camera_permission', 'granted');
-    } catch (err) {
-      console.warn('Camera access denied or unavailable:', err);
-      setCameraError(true);
-      setCameraActive(false);
-    }
-  };
-
-  // Automatically start camera if previously permitted
+  // Automatically start camera when on scan screen (browser handles one-time permission natively)
   useEffect(() => {
     if (step !== 'scan') return;
 
-    if (localStorage.getItem('brimo_camera_permission') === 'granted') {
-      requestCameraPermission();
-    }
+    let cancelled = false;
+
+    const startCamera = async () => {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          if (!cancelled) setCameraError(true);
+          return;
+        }
+
+        let stream: MediaStream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false,
+          });
+        } catch {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+
+        if (cancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(() => {});
+        }
+        setCameraActive(true);
+        setCameraError(false);
+      } catch (err) {
+        console.warn('Camera access denied or unavailable:', err);
+        if (!cancelled) {
+          setCameraError(true);
+          setCameraActive(false);
+        }
+      }
+    };
+
+    void startCamera();
 
     return () => {
+      cancelled = true;
+      setCameraActive(false);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
       }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, [step]);
+
+  // Ensure video element stays bound to active stream across renders
+  useEffect(() => {
+    if (step === 'scan' && cameraActive && videoRef.current && streamRef.current) {
+      if (videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+      void videoRef.current.play().catch(() => {});
+    }
+  }, [cameraActive, step]);
 
   // Real-time live camera feed QR/Barcode detection with jsQR
   useEffect(() => {
@@ -506,23 +521,6 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
     }
   };
 
-  const handleQuickScan = () => {
-    setIsProcessingQR(true);
-    setMerchant({
-      name: 'Kios Ummy 77',
-      service: 'QRIS Bayar',
-      id: '26020400000239',
-      city: '',
-    });
-    setNominalStr('');
-    setIsDynamicQr(false);
-    setNote('');
-    setTimeout(() => {
-      setIsProcessingQR(false);
-      setStep('input_nominal');
-    }, 600);
-  };
-
   return (
     <div className="h-full w-full bg-slate-900 text-white flex flex-col justify-between overflow-hidden select-none">
       {/* Hidden File Input for Gallery Picker */}
@@ -539,16 +537,20 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
         <div className="flex-1 flex flex-col justify-between relative bg-black overflow-hidden animate-in fade-in duration-200">
           <StatusBar darkTheme={true} />
 
-          {/* Real Live Camera Video Background */}
-          {cameraActive ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-          ) : (
+          {/* Real Live Camera Video Background (always mounted so streamRef attaches immediately) */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            onLoadedMetadata={() => {
+              void videoRef.current?.play().catch(() => {});
+            }}
+            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-200 ${
+              cameraActive ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          {!cameraActive && (
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-black z-0 flex items-center justify-center">
               <Camera size={48} className="text-white/10 animate-pulse" />
             </div>
@@ -578,9 +580,8 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
           <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 my-auto">
             {/* Camera Viewfinder Box with exact 270x270 size */}
             <div
-              onClick={handleQuickScan}
-              className="w-[270px] h-[270px] relative active:scale-[0.99] transition-transform flex items-center justify-center rounded-sm"
-              title="Arahkan kamera ke QRIS atau ketuk untuk bayar"
+              className="w-[270px] h-[270px] relative flex items-center justify-center rounded-sm"
+              title="Arahkan kamera ke kode QRIS"
             >
               {/* 4 Thick Corner Brackets */}
               <div className="absolute top-0 left-0 w-10 h-10 border-t-[4px] border-l-[4px] border-white drop-shadow-md z-10" />
@@ -593,53 +594,45 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
                 <div className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#38BDF8] to-transparent shadow-[0_0_14px_#38BDF8] animate-scan-laser z-10" />
               )}
 
-              {/* Inactive Camera State: Button to grant permission */}
-              {!cameraActive && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-20">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      requestCameraPermission();
-                    }}
-                    className="px-4 py-2.5 bg-[#1078CA] hover:bg-blue-600 text-white rounded-full text-xs font-bold flex items-center space-x-2 shadow-xl ring-2 ring-white/30 active:scale-95 transition-all"
-                  >
-                    <Camera size={16} />
-                    <span>Aktifkan Kamera</span>
-                  </button>
-                  <span className="text-[10px] text-white/80 mt-2 font-medium drop-shadow">
-                    Ketuk untuk izinkan akses kamera
+              {/* Camera permission denied / unavailable notice */}
+              {cameraError && !cameraActive && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-5 text-center z-20">
+                  <Camera size={28} className="text-white/50 mb-2" />
+                  <span className="text-xs text-white/85 font-medium leading-relaxed drop-shadow">
+                    Akses kamera tidak tersedia atau ditolak. Izinkan kamera di pengaturan browser, atau unggah QR dari galeri.
                   </span>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Flashlight & Gallery Circle Buttons */}
-            <div className="flex items-center justify-between w-[270px] mt-8">
+          {/* Bottom Area: Flashlight & Gallery edge buttons, Blue Info Banner & White Drawer */}
+          <div className="z-20 w-full mt-auto">
+            {/* Flashlight (left edge) & Gallery (right edge) directly above the blue banner */}
+            <div className="px-4 pb-3 flex items-center justify-between">
               <button
                 type="button"
                 onClick={toggleFlashlight}
-                className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all ${
+                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all ${
                   flashlightOn ? 'bg-amber-400 text-slate-900 ring-4 ring-amber-400/40' : 'bg-white text-slate-800'
                 }`}
                 title="Lampu Senter"
+                aria-label="Lampu Senter"
               >
-                <Zap size={22} className={flashlightOn ? 'fill-current' : ''} />
+                <Zap size={20} className={flashlightOn ? 'fill-current' : ''} />
               </button>
 
               <button
                 type="button"
                 onClick={handleGalleryClick}
-                className="w-12 h-12 rounded-full bg-white/95 text-[#1078CA] flex items-center justify-center shadow-xl border border-white/40 active:scale-90 transition-all hover:bg-white"
+                className="w-11 h-11 rounded-full bg-white/95 text-[#1078CA] flex items-center justify-center shadow-xl border border-white/40 active:scale-90 transition-all hover:bg-white"
                 title="Unggah Gambar Barcode dari Galeri"
+                aria-label="Unggah Gambar QR dari Galeri"
               >
-                <ImageIcon size={22} className="text-[#1078CA]" />
+                <ImageIcon size={20} className="text-[#1078CA]" />
               </button>
             </div>
-          </div>
 
-          {/* Bottom Area: Blue Info Banner & White Drawer */}
-          <div className="z-20 w-full mt-auto">
             {/* Blue Banner: Bisa scan QR di berbagai negara! */}
             <div 
               onClick={() => alert('Fitur QRIS Cross Border: Berlaku di Malaysia, Thailand, dan Singapura')}
@@ -659,8 +652,10 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               {/* Card 1: Alfamart / QR Bayar */}
               <button 
                 type="button"
-                onClick={handleQuickScan}
-                className="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs hover:border-[#1078CA] active:scale-95 transition-all"
+                onClick={() => setQrMode('bayar')}
+                className={`rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs active:scale-95 transition-all border ${
+                  qrMode === 'bayar' ? 'bg-blue-50/40 border-[#1078CA]' : 'bg-white border-slate-200 hover:border-[#1078CA]'
+                }`}
               >
                 <div className="h-6 flex items-center justify-center mb-1">
                   <span className="text-[11px] font-black text-rose-600 tracking-tight">
@@ -673,8 +668,10 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
               {/* Card 2: QR Transfer */}
               <button 
                 type="button"
-                onClick={handleQuickScan}
-                className="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs hover:border-[#1078CA] active:scale-95 transition-all"
+                onClick={() => setQrMode('transfer')}
+                className={`rounded-2xl p-3 flex flex-col items-center justify-center shadow-xs active:scale-95 transition-all border ${
+                  qrMode === 'transfer' ? 'bg-blue-50/40 border-[#1078CA]' : 'bg-white border-slate-200 hover:border-[#1078CA]'
+                }`}
               >
                 <div className="h-6 flex items-center justify-center mb-1">
                   <div className="w-5 h-5 rounded-md bg-blue-50 text-[#1078CA] flex items-center justify-center">
@@ -837,49 +834,6 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
       )}
 
       {/* --- MODALS & DIALOGS --- */}
-
-      {/* Camera Permission Dialog (Android System Style in BRImo) */}
-      {showPermissionDialog && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-6 animate-in fade-in">
-          <div className="bg-[#2D3133] text-white rounded-3xl p-6 w-full max-w-xs shadow-2xl space-y-4 animate-sheet-up">
-            <div className="w-12 h-12 rounded-full bg-[#1078CA]/20 text-[#38BDF8] flex items-center justify-center mx-auto mb-1">
-              <Camera size={26} />
-            </div>
-            <div className="text-center">
-              <h3 className="text-sm font-bold text-white leading-snug">
-                Izinkan BRImo mengambil gambar dan merekam video?
-              </h3>
-              <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                Aplikasi memerlukan izin kamera untuk memindai kode QRIS pembayaran dan transfer secara langsung.
-              </p>
-            </div>
-
-            <div className="pt-2 space-y-2">
-              <button
-                type="button"
-                onClick={requestCameraPermission}
-                className="w-full py-3 bg-[#1078CA] hover:bg-blue-600 active:scale-98 text-white font-bold text-xs rounded-xl shadow-md transition-all"
-              >
-                Saat aplikasi digunakan
-              </button>
-              <button
-                type="button"
-                onClick={requestCameraPermission}
-                className="w-full py-2.5 bg-white/10 hover:bg-white/15 active:scale-98 text-white font-semibold text-xs rounded-xl transition-all"
-              >
-                Hanya kali ini
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPermissionDialog(false)}
-                className="w-full py-2 text-slate-400 hover:text-white text-xs font-medium transition-colors"
-              >
-                Jangan izinkan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PIN Modal (Frosted Glass UI Otentik ala BRImo) */}
       {showPinModal && (

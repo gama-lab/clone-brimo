@@ -161,7 +161,6 @@ export const PullToRefreshContainer: React.FC<PullToRefreshContainerProps> = ({
 
   const isBlueTone = tone === 'blue';
   const progress = Math.min(1, pullDistance / PULL_THRESHOLD);
-  const readyToRelease = pullDistance >= PULL_THRESHOLD;
 
   return (
     <div
@@ -184,7 +183,7 @@ export const PullToRefreshContainer: React.FC<PullToRefreshContainerProps> = ({
         }}
       >
         <div
-          className="flex items-center space-x-2"
+          className="flex items-center justify-center"
           style={{
             opacity: isRefreshing ? 1 : Math.min(1, progress * 1.15),
             transform: `scale(${isRefreshing ? 1 : 0.78 + progress * 0.22})`,
@@ -205,17 +204,6 @@ export const PullToRefreshContainer: React.FC<PullToRefreshContainerProps> = ({
               }
             />
           </div>
-          <span
-            className={`text-[11px] font-semibold tracking-tight ${
-              isBlueTone ? 'text-white/95' : 'text-slate-600'
-            }`}
-          >
-            {isRefreshing
-              ? 'Memperbarui data...'
-              : readyToRelease
-              ? 'Lepas untuk memperbarui'
-              : 'Tarik untuk memperbarui'}
-          </span>
         </div>
       </div>
 
