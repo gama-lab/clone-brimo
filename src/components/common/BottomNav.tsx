@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, ReceiptText, Mail, User } from 'lucide-react';
 import { Screen } from '../../types';
+import qrisLogoWhite from '../../assets/qris-logo-white.png';
 
 interface BottomNavProps {
   currentScreen: Screen;
@@ -47,27 +48,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           className="w-14 h-14 rounded-full bg-[#1078CA] text-white shadow-[0_8px_20px_rgba(16,120,202,0.45)] ring-4 ring-white active:scale-90 transition-all flex items-center justify-center"
           title="Scan QRIS"
         >
-          {/* Official BRImo QRIS scanner icon with corner brackets and centered text */}
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            {/* 4 Corner brackets */}
-            <path d="M4 9V5a1 1 0 0 1 1-1h4" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M19 4h4a1 1 0 0 1 1 1v4" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M4 19v4a1 1 0 0 0 1 1h4" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M19 24h4a1 1 0 0 0 1-1v-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            {/* Center QRIS Text */}
-            <text
-              x="14"
-              y="16.5"
-              fill="white"
-              fontSize="7"
-              fontWeight="900"
-              fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
-              textAnchor="middle"
-              letterSpacing="-0.3"
-            >
-              QRIS
-            </text>
-          </svg>
+          <img
+            src={qrisLogoWhite}
+            alt="QRIS"
+            draggable={false}
+            className="w-10 h-auto object-contain pointer-events-none select-none"
+          />
         </button>
       </div>
 
