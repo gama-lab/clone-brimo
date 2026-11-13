@@ -19,7 +19,7 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
   const [showDetailModal, setShowDetailModal] = useState(false);
 
   return (
-    <div className="min-h-full h-full w-full bg-slate-50 flex flex-col justify-between select-none">
+    <div className="h-full w-full bg-slate-50 flex flex-col justify-between overflow-hidden select-none">
       {/* 1. TOP HEADER BAR */}
       <div className="bg-[#1078CA] text-white pt-2 pb-3.5 px-4 flex-shrink-0 shadow-sm relative z-20">
         <StatusBar darkTheme={true} />
@@ -56,7 +56,7 @@ export const InfoSaldoScreen: React.FC<InfoSaldoScreenProps> = ({
       </div>
 
       {/* 2. SCROLLABLE CONTENT BODY */}
-      <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
+      <div className="flex-1 min-h-0 native-scroll flex flex-col">
         {/* Total Saldo Card Section */}
         <div className="bg-white px-4 pt-6 pb-6 text-center flex flex-col items-center">
           <span className="text-xs font-medium text-slate-500 tracking-tight">

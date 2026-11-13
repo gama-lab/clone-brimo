@@ -524,7 +524,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
   };
 
   return (
-    <div className="h-full min-h-full w-full bg-slate-900 text-white flex flex-col justify-between select-none">
+    <div className="h-full w-full bg-slate-900 text-white flex flex-col justify-between overflow-hidden select-none">
       {/* Hidden File Input for Gallery Picker */}
       <input
         type="file"
@@ -704,7 +704,7 @@ export const QrisScreen: React.FC<QrisScreenProps> = ({
           </div>
 
           {/* Merchant Card Scrollable Body */}
-          <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+          <div className="flex-1 min-h-0 native-scroll p-4 space-y-4">
               <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center space-x-3.5">
                 <div className="w-12 h-12 rounded-full bg-blue-50 text-[#1078CA] flex items-center justify-center flex-shrink-0 border border-blue-100">
                   <Store size={22} />

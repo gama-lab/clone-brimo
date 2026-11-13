@@ -46,57 +46,59 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-full flex flex-col justify-between bg-gradient-to-b from-[#0A6EC7] via-[#1078CA] to-[#1884DC] text-white relative overflow-hidden select-none">
-      <StatusBar darkTheme={true} />
+    <div className="h-full w-full flex flex-col justify-between bg-gradient-to-b from-[#0A6EC7] via-[#1078CA] to-[#1884DC] text-white relative overflow-hidden select-none">
+      <div className="flex-shrink-0">
+        <StatusBar darkTheme={true} />
 
-      {/* Top Header Bar */}
-      <div className="px-4 pt-2 flex items-center justify-between z-10">
-        {/* Language selector pill */}
-        <button
-          onClick={() => alert('Bahasa: Indonesia (ID)')}
-          className="flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/30 transition-all border border-white/20"
-        >
-          <span className="text-sm">🇮🇩</span>
-          <span>ID</span>
-        </button>
+        {/* Top Header Bar */}
+        <div className="px-4 pt-2 flex items-center justify-between z-10">
+          {/* Language selector pill */}
+          <button
+            onClick={() => alert('Bahasa: Indonesia (ID)')}
+            className="flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/30 active:scale-95 transition-all border border-white/20"
+          >
+            <span className="text-sm">🇮🇩</span>
+            <span>ID</span>
+          </button>
 
-        {/* Center Logo */}
-        <BrimoLogo size="lg" variant="white" />
+          {/* Center Logo */}
+          <BrimoLogo size="lg" variant="white" />
 
-        {/* Right Contact button */}
-        <button
-          onClick={() => alert('Kontak Kami: Contact BRI 1500017 / Sabrina Chat')}
-          className="flex items-center space-x-1 text-white/90 hover:text-white text-xs font-semibold"
-        >
-          <Headphones size={16} />
-          <span className="text-[11px] leading-tight">Kontak<br />Kami</span>
-        </button>
+          {/* Right Contact button */}
+          <button
+            onClick={() => alert('Kontak Kami: Contact BRI 1500017 / Sabrina Chat')}
+            className="flex items-center space-x-1 text-white/90 hover:text-white active:scale-95 text-xs font-semibold transition-all"
+          >
+            <Headphones size={16} />
+            <span className="text-[11px] leading-tight">Kontak<br />Kami</span>
+          </button>
+        </div>
       </div>
 
       {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-2 pb-6 z-10 text-center">
-        <h2 className="text-sm font-semibold text-white/95 mb-6 tracking-wide">
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-4 py-2 z-10 text-center overflow-hidden">
+        <h2 className="text-sm font-semibold text-white/95 mb-4 tracking-wide flex-shrink-0">
           Yuk! mulai transaksimu bersama BRImo!
         </h2>
 
         {/* Clean Native Hero Showcase Displaying BRImo Icon */}
-        <div className="relative w-64 h-64 flex items-center justify-center">
+        <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex items-center justify-center flex-shrink-0">
           {/* Circular backdrop illustration */}
           <div className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-inner" />
           <div className="absolute inset-5 rounded-full bg-gradient-to-tr from-sky-400/20 to-white/15" />
 
           {/* City skyline silhouettes */}
-          <div className="absolute bottom-6 w-52 h-14 bg-white/10 rounded-t-2xl pointer-events-none" />
+          <div className="absolute bottom-5 w-44 h-12 bg-white/10 rounded-t-2xl pointer-events-none" />
 
           {/* Official BRImo Icon (BRI on top, Mo in sky blue) */}
           <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
-            <BrimoAppIcon size={96} className="shadow-2xl ring-4 ring-white/30" />
+            <BrimoAppIcon size={88} className="shadow-2xl ring-4 ring-white/30" />
           </div>
         </div>
       </div>
 
       {/* Bottom Fast Menu & Login Actions Card (Extended through safe area to ensure bottom navigation is pure white) */}
-      <div className="bg-white text-slate-800 rounded-t-3xl pt-4 pb-[max(1.75rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] px-4 shadow-[0_-10px_35px_rgba(0,0,0,0.15)] z-10">
+      <div className="flex-shrink-0 bg-white text-slate-800 rounded-t-3xl pt-4 pb-[max(1.75rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] px-4 shadow-[0_-10px_35px_rgba(0,0,0,0.15)] z-10">
         {/* Fast Menu Header */}
         <div className="flex items-center justify-center space-x-1 text-slate-500 mb-3">
           <span className="text-xs font-bold">Fast Menu</span>

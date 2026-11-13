@@ -78,20 +78,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   ];
 
   return (
-    <div className="min-h-full pb-20 bg-slate-50 flex flex-col select-none">
-      {/* Top Blue Canvas Header */}
-      <div className="bg-[#1078CA] text-white pt-2 pb-6 px-4 rounded-b-[2rem] shadow-sm relative flex-shrink-0">
-        {/* Decorative layer is clipped on its own so it can never crop the content cards */}
-        <div className="absolute inset-0 rounded-b-[2rem] overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
-        </div>
-
-        <div className="relative">
-          <StatusBar darkTheme={true} />
-        </div>
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none">
+      {/* Pinned Top Blue Header Bar (Never scrolls off screen like native app) */}
+      <div className="bg-[#1078CA] text-white pt-2 pb-2.5 px-4 relative flex-shrink-0 z-20">
+        <StatusBar darkTheme={true} />
 
         {/* Top Header Row */}
-        <div className="relative flex items-center justify-between mt-2 mb-3">
+        <div className="relative flex items-center justify-between mt-2">
           {/* Logo and Greeting */}
           <div className="flex items-center space-x-2.5">
             <BrimoLogo size="md" variant="white" />
@@ -105,68 +98,78 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="flex items-center space-x-2">
             <button 
               onClick={() => alert('Notifikasi BRImo: 2 pesan baru')}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white relative transition-all"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-white relative transition-all"
             >
               <Bell size={17} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border border-white" />
             </button>
             <button 
               onClick={() => alert('Sabrina: Asisten Virtual BRI 24/7')}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-white transition-all"
             >
               <Headphones size={17} />
             </button>
             <button 
               onClick={() => onNavigate('account')}
-              className="w-8 h-8 rounded-full bg-white/20 font-bold text-xs flex items-center justify-center text-white ring-1 ring-white/30"
+              className="w-8 h-8 rounded-full bg-white/20 active:scale-95 font-bold text-xs flex items-center justify-center text-white ring-1 ring-white/30 transition-all"
             >
               HP
             </button>
           </div>
         </div>
-
-        {/* Card Keterangan: Saldo Rekening Utama (Harus tampil penuh & tidak tertutupi) */}
-        <div className="relative mt-3 flex-shrink-0 bg-gradient-to-r from-[#0c5999] via-[#0b63ac] to-[#1078CA] rounded-2xl p-4 border border-white/20 shadow-lg overflow-hidden">
-          {/* Wavy background accent */}
-          <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none" />
-
-          {/* Title and Balance */}
-          <div>
-            <span className="text-[11px] text-white/80 font-medium">Saldo Rekening Utama</span>
-            <div className="flex items-center space-x-3 mt-1">
-              <span className="text-xl font-black tracking-wider text-white">
-                {showBalance ? formatRupiah(user.balance) : '••••••••'}
-              </span>
-              <button
-                onClick={() => setShowBalance(!showBalance)}
-                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all"
-              >
-                {showBalance ? <EyeOff size={13} /> : <Eye size={13} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Link: Semua Rekeningmu */}
-          <div 
-            onClick={() => onNavigate('info-saldo')}
-            className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between cursor-pointer active:opacity-85 transition-opacity"
-          >
-            <button
-              type="button"
-              className="text-xs font-semibold text-white/95 hover:text-white flex items-center space-x-1"
-            >
-              <span>Semua Rekeningmu</span>
-              <ChevronRight size={14} />
-            </button>
-            <span className="text-[10px] text-blue-200 font-mono">
-              3819 0104 **** 532
-            </span>
-          </div>
-        </div>
       </div>
 
-      {/* Main Body (Tampil di bawah Card Keterangan tanpa menutupi) */}
-      <div className="px-4 mt-3.5 space-y-3.5">
+      {/* Scrollable Home Content Body */}
+      <div className="flex-1 min-h-0 native-scroll pb-6">
+        {/* Blue Curved Saldo Container */}
+        <div className="bg-[#1078CA] text-white pt-1.5 pb-6 px-4 rounded-b-[2rem] shadow-sm relative">
+          {/* Decorative layer is clipped on its own so it can never crop the content cards */}
+          <div className="absolute inset-0 rounded-b-[2rem] overflow-hidden pointer-events-none" aria-hidden="true">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
+          </div>
+
+          {/* Card Keterangan: Saldo Rekening Utama (Harus tampil penuh & tidak tertutupi) */}
+          <div className="relative flex-shrink-0 bg-gradient-to-r from-[#0c5999] via-[#0b63ac] to-[#1078CA] rounded-2xl p-4 border border-white/20 shadow-lg overflow-hidden">
+            {/* Wavy background accent */}
+            <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none" />
+
+            {/* Title and Balance */}
+            <div>
+              <span className="text-[11px] text-white/80 font-medium">Saldo Rekening Utama</span>
+              <div className="flex items-center space-x-3 mt-1">
+                <span className="text-xl font-black tracking-wider text-white">
+                  {showBalance ? formatRupiah(user.balance) : '••••••••'}
+                </span>
+                <button
+                  onClick={() => setShowBalance(!showBalance)}
+                  className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all"
+                >
+                  {showBalance ? <EyeOff size={13} /> : <Eye size={13} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Link: Semua Rekeningmu */}
+            <div 
+              onClick={() => onNavigate('info-saldo')}
+              className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between cursor-pointer active:opacity-85 transition-opacity"
+            >
+              <button
+                type="button"
+                className="text-xs font-semibold text-white/95 hover:text-white flex items-center space-x-1"
+              >
+                <span>Semua Rekeningmu</span>
+                <ChevronRight size={14} />
+              </button>
+              <span className="text-[10px] text-blue-200 font-mono">
+                3819 0104 **** 532
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Body (Tampil di bawah Card Keterangan tanpa menutupi) */}
+        <div className="px-4 mt-3.5 space-y-3.5">
         {/* Main Action Buttons (Transfer, BRIVA, Cicil Emas, Pulsa/Data) */}
         <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 flex items-center justify-around">
           <button onClick={onOpenTransfer} className="flex flex-col items-center active:scale-95 transition-transform">
@@ -321,6 +324,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <span className="text-[11px] font-medium text-slate-700 mt-1.5">Kartu</span>
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>

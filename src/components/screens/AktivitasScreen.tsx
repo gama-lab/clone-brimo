@@ -37,9 +37,9 @@ export const AktivitasScreen: React.FC<AktivitasScreenProps> = ({
   }, [outgoingTransactions, filterType]);
 
   return (
-    <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none">
-      {/* Top Bar (from Photo on 31-10-26 at 15.17 #2.jpg) */}
-      <div className="bg-[#1078CA] text-white pt-1 pb-3 px-4 sticky top-0 z-30 shadow-sm">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none">
+      {/* Top Bar (Pinned, never scrolls off screen) */}
+      <div className="bg-[#1078CA] text-white pt-1 pb-3 px-4 flex-shrink-0 z-30 shadow-sm">
         <StatusBar darkTheme={true} />
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center space-x-3">
@@ -119,8 +119,8 @@ export const AktivitasScreen: React.FC<AktivitasScreenProps> = ({
         </div>
       </div>
 
-      {/* List Items (Differentiated by category) */}
-      <div className="p-3 space-y-2.5">
+      {/* Scrollable List Items (Differentiated by category) */}
+      <div className="flex-1 min-h-0 native-scroll p-3 pb-6 space-y-2.5">
         {displayedTransactions.length === 0 ? (
           <div className="py-12 text-center text-slate-400">
             <Filter size={32} className="mx-auto mb-2 opacity-40" />

@@ -5,6 +5,20 @@
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  html,
+  body,
+  #root {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   body {
@@ -12,6 +26,31 @@
     user-select: none;
     -webkit-user-select: none;
   }
+
+  input,
+  textarea {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  button,
+  [role='button'],
+  a {
+    touch-action: manipulation;
+  }
+}
+
+/* Native momentum scroll container with hidden scrollbars */
+.native-scroll {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.native-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 /* Custom hide scrollbars for cleaner mobile app feel */

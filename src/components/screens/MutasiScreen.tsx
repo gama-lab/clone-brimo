@@ -73,20 +73,20 @@ export const MutasiScreen: React.FC<MutasiScreenProps> = ({
   };
 
   return (
-    <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none">
-      {/* Top Header Bar */}
-      <div className="bg-[#1078CA] text-white pt-1 pb-4 px-4 sticky top-0 z-30 shadow-sm">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none">
+      {/* Top Header Bar (Pinned) */}
+      <div className="bg-[#1078CA] text-white pt-1 pb-4 px-4 flex-shrink-0 z-30 shadow-sm">
         <StatusBar darkTheme={true} />
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center space-x-3">
-            <button onClick={() => onNavigate('home')} className="p-1 hover:bg-white/10 rounded-full">
+            <button onClick={() => onNavigate('home')} className="p-1 hover:bg-white/10 rounded-full active:scale-95 transition-transform">
               <ArrowLeft size={22} />
             </button>
             <h1 className="text-base font-bold">Mutasi</h1>
           </div>
           <button
             onClick={() => alert('e-Statement PDF dari folder Mutasi berhasil diunduh!')}
-            className="flex items-center space-x-1.5 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
+            className="flex items-center space-x-1.5 bg-white/20 hover:bg-white/30 active:scale-95 px-3 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
           >
             <Download size={13} />
             <span>e-Statement</span>
@@ -110,8 +110,8 @@ export const MutasiScreen: React.FC<MutasiScreenProps> = ({
         </div>
       </div>
 
-      {/* Filter Tabs & Search */}
-      <div className="p-4 space-y-3 bg-white border-b border-slate-100 shadow-sm">
+      {/* Filter Tabs & Search (Pinned below header) */}
+      <div className="p-4 space-y-3 bg-white border-b border-slate-100 shadow-sm flex-shrink-0 z-20">
         {/* Search */}
         <div className="relative flex items-center">
           <Search size={15} className="absolute left-3 text-slate-400" />
@@ -158,8 +158,8 @@ export const MutasiScreen: React.FC<MutasiScreenProps> = ({
         </div>
       </div>
 
-      {/* Grouped Transactions List */}
-      <div className="p-4 space-y-4">
+      {/* Scrollable Grouped Transactions List */}
+      <div className="flex-1 min-h-0 native-scroll p-4 pb-6 space-y-4">
         {Object.keys(grouped).length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-slate-100 mt-4">
             <Receipt size={32} className="text-slate-300 mx-auto mb-2" />

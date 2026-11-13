@@ -88,9 +88,9 @@ export const App: React.FC = () => {
     currentScreen === 'account';
 
   return (
-    <div className="h-[100dvh] w-full max-w-md mx-auto bg-white flex flex-col relative select-none overflow-hidden">
-      {/* Screen Content Router */}
-      <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col bg-white">
+    <div className="h-full w-full max-w-md mx-auto bg-white flex flex-col relative select-none overflow-hidden">
+      {/* Screen Content Router (Strictly bounded with min-h-0 so screens manage internal scroll without pushing topbar/bottombar) */}
+      <div className="flex-1 min-h-0 overflow-hidden relative flex flex-col bg-white">
         {currentScreen === 'login' && (
           <LoginScreen onLoginSuccess={handleLoginSuccess} />
         )}

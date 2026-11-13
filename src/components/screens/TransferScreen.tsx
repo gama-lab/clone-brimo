@@ -286,7 +286,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
             </div>
 
           {/* Scrollable Content Body */}
-          <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="flex-1 min-h-0 native-scroll">
             <div className="p-4 space-y-4">
               {/* Transfer Terakhir Horizontal Cards (Only MANSYUR & Nur intan, Allo Bank excluded as requested) */}
               {!searchQuery && (
@@ -502,7 +502,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
             </div>
 
           {/* Scrollable Form */}
-          <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+          <div className="flex-1 min-h-0 native-scroll p-4 space-y-4">
               {/* Bank Tujuan (Click to open Daftar Bank bottom sheet modal, exact match to media_1793440655584_f7c42ff3.png) */}
               <div>
                 <label className="text-xs font-bold text-slate-800 block mb-1.5">Bank Tujuan</label>
@@ -611,7 +611,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
           </div>
 
           {/* Scrollable Form Body */}
-          <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3.5">
+          <div className="flex-1 min-h-0 native-scroll p-4 space-y-3.5">
               {/* Beneficiary Header */}
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-sm flex items-center space-x-3">
                 <div className={`w-11 h-11 rounded-full ${selectedBeneficiary.avatarBg || 'bg-slate-100 text-[#1078CA]'} font-bold flex items-center justify-center text-sm flex-shrink-0`}>
@@ -776,7 +776,7 @@ export const TransferScreen: React.FC<TransferScreenProps> = ({
           </div>
 
           {/* Scrollable Confirmation Body */}
-          <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+          <div className="flex-1 min-h-0 native-scroll p-4 space-y-4">
             <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3.5">
               <div className="text-center pb-3 border-b border-slate-100">
                 <span className="text-[11px] text-slate-400 font-semibold uppercase">Total Transfer</span>

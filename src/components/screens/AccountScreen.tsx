@@ -32,13 +32,13 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({
   const [fingerprintEnabled, setFingerprintEnabled] = useState(true);
 
   return (
-    <div className="min-h-full pb-20 bg-slate-50 flex flex-col select-none">
-      {/* Top Header Bar */}
-      <div className="bg-[#1078CA] text-white pt-1 pb-4 px-4 sticky top-0 z-30 shadow-sm">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none">
+      {/* Top Header Bar (Pinned, never scrolls off screen) */}
+      <div className="bg-[#1078CA] text-white pt-1 pb-4 px-4 flex-shrink-0 z-30 shadow-sm">
         <StatusBar darkTheme={true} />
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center space-x-3">
-            <button onClick={() => onNavigate('home')} className="p-1 hover:bg-white/10 rounded-full">
+            <button onClick={() => onNavigate('home')} className="p-1 hover:bg-white/10 rounded-full active:scale-95 transition-transform">
               <ArrowLeft size={22} />
             </button>
             <h1 className="text-base font-bold">Akun</h1>
@@ -47,7 +47,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="flex-1 min-h-0 native-scroll p-4 pb-6 space-y-4">
         {/* Profile Card (from Photo on 31-10-26 at 15.18.jpg) */}
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div className="flex items-center space-x-3">

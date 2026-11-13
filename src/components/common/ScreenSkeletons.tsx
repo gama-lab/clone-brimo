@@ -8,7 +8,7 @@ import { StatusBar } from './StatusBar';
 
 export const HomeSkeleton: React.FC = () => {
   return (
-    <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none animate-in fade-in duration-150">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none animate-in fade-in duration-150">
       {/* Top Blue Header */}
       <div className="bg-[#1078CA] px-4 pt-2 pb-5 rounded-b-[2rem] relative overflow-hidden">
         <StatusBar darkTheme={true} />
@@ -81,7 +81,7 @@ export const HomeSkeleton: React.FC = () => {
 
 export const MutasiSkeleton: React.FC = () => {
   return (
-    <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none animate-in fade-in duration-150">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none animate-in fade-in duration-150">
       {/* Top Header */}
       <div className="bg-[#1078CA] px-4 pt-3 pb-4">
         <StatusBar darkTheme={true} />
@@ -122,7 +122,7 @@ export const MutasiSkeleton: React.FC = () => {
 
 export const AktivitasSkeleton: React.FC = () => {
   return (
-    <div className="min-h-full pb-32 bg-slate-50 flex flex-col select-none animate-in fade-in duration-150">
+    <div className="h-full w-full bg-slate-50 flex flex-col overflow-hidden select-none animate-in fade-in duration-150">
       {/* Top Header */}
       <div className="bg-[#1078CA] px-4 pt-3 pb-3">
         <StatusBar darkTheme={true} />
